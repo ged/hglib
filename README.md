@@ -1,13 +1,13 @@
 # hglib
 
 home
-: http://deveiate.org/projects/hglib
+: http://bitbucket.org/ged/ruby-hglib
 
 code
-: http://bitbucket.org/ged/hglib
+: http://bitbucket.org/ged/ruby-hglib
 
 github
-: https://github.com/ged/hglib
+: https://github.com/ged/ruby-hglib
 
 docs
 : http://deveiate.org/code/hglib
@@ -15,7 +15,8 @@ docs
 
 ## Description
 
-
+This is a client library for the Mercurial distributed revision control tool
+that uses the [Command Server][cmdserver] for efficiency.
 
 
 ## Prerequisites
@@ -31,8 +32,8 @@ docs
 ## Contributing
 
 You can check out the current development source with Mercurial via its
-{project page}[http://bitbucket.org/ged/hglib]. Or if you prefer Git, via 
-{its Github mirror}[https://github.com/ged/hglib].
+[project page](http://bitbucket.org/ged/ruby-hglib). Or if you prefer Git, via
+[its Github mirror](https://github.com/ged/ruby-hglib).
 
 After checking out the source, run:
 
@@ -72,4 +73,6 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+[cmdserver]:https://www.mercurial-scm.org/wiki/CommandServer
 

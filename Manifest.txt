@@ -1,5 +1,8 @@
 .simplecov
 ChangeLog
+History.md
+LICENSE.txt
+Manifest.txt
 README.md
 Rakefile
 lib/hglib.rb
