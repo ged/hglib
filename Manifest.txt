@@ -1,0 +1,7 @@
+.simplecov
+ChangeLog
+README.md
+Rakefile
+lib/hglib.rb
+spec/hglib_spec.rb
+spec/spec_helper.rb
