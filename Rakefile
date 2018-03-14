@@ -17,20 +17,27 @@ Hoe.plugins.delete :rubyforge
 Hoe.plugins.delete :gemcutter # Remove for public gems
 
 hoespec = Hoe.spec 'hglib' do |spec|
-
 	spec.readme_file = 'README.md'
 	spec.history_file = 'History.md'
 
 	spec.extra_rdoc_files = FileList[ '*.rdoc', '*.md' ]
 	spec.license 'BSD-3-Clause'
 
+	spec.urls = {
+		home:   'http://deveiate.org/projects/hglib',
+		code:   'http://bitbucket.org/ged/hglib',
+		docs:   'http://deveiate.org/code/hglib',
+		github: 'http://github.com/ged/hglib',
+	}
+
 	spec.developer 'Michael Granger', 'ged@FaerieMUD.org'
 
 	spec.dependency 'loggability', '~> 0.11'
 
-	spec.dependency 'hoe-deveiate',            '~> 0.3', :developer
+	spec.dependency 'hoe-deveiate',            '~> 0.10', :developer
 	spec.dependency 'simplecov',               '~> 0.7', :developer
 	spec.dependency 'rdoc-generator-fivefish', '~> 0.1', :developer
+	spec.dependency 'rdoc',                    '~> 6.0', :developer
 
 	spec.require_ruby_version( '>=2.5.0' )
 	spec.hg_sign_tags = true if spec.respond_to?( :hg_sign_tags= )

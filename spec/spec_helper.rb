@@ -2,20 +2,28 @@
 #encoding: utf-8
 
 require 'simplecov' if ENV['COVERAGE']
-
 require 'rspec'
 
-require 'loggability/spechelpers'
+require 'hglib'
 
-
-### Mock with RSpec
 RSpec.configure do |config|
-	config.run_all_when_everything_filtered = true
-	config.filter_run :focus
-	config.order = 'random'
-	config.mock_with( :rspec ) do |mock|
-		mock.syntax = :expect
+	config.expect_with :rspec do |expectations|
+		expectations.include_chain_clauses_in_custom_matcher_descriptions = true
 	end
+
+	config.mock_with :rspec do |mocks|
+		mocks.verify_partial_doubles = true
+	end
+
+	config.shared_context_metadata_behavior = :apply_to_host_groups
+	config.filter_run_when_matching :focus
+	config.example_status_persistence_file_path = "spec/.status"
+	config.disable_monkey_patching!
+	config.warnings = true
+	config.profile_examples = 10
+	config.order = :random
+
+	config.filter_run_excluding( :requires_binary ) unless Hglib.hg_path.executable?
+
+	Kernel.srand( config.seed )
 end
-
-

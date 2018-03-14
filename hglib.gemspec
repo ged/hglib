@@ -1,20 +1,20 @@
 # -*- encoding: utf-8 -*-
-# stub: hglib 0.1.pre20180124085219 ruby lib
+# stub: hglib 0.1.pre20180129173049 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "hglib".freeze
-  s.version = "0.1.pre20180124085219"
+  s.version = "0.1.pre20180129173049"
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Michael Granger".freeze]
   s.cert_chain = ["certs/ged.pem".freeze]
-  s.date = "2018-01-24"
+  s.date = "2018-01-30"
   s.description = "This is a client library for the Mercurial distributed revision control tool\nthat uses the [Command Server][cmdserver] for efficiency.".freeze
   s.email = ["ged@FaerieMUD.org".freeze]
   s.extra_rdoc_files = ["History.md".freeze, "LICENSE.txt".freeze, "Manifest.txt".freeze, "README.md".freeze, "History.md".freeze, "README.md".freeze]
   s.files = [".simplecov".freeze, "ChangeLog".freeze, "History.md".freeze, "LICENSE.txt".freeze, "Manifest.txt".freeze, "README.md".freeze, "Rakefile".freeze, "lib/hglib.rb".freeze, "spec/hglib_spec.rb".freeze, "spec/spec_helper.rb".freeze]
-  s.homepage = "home".freeze
+  s.homepage = "http://deveiate.org/projects/hglib".freeze
   s.licenses = ["BSD-3-Clause".freeze]
   s.rdoc_options = ["--main".freeze, "README.md".freeze]
   s.required_ruby_version = Gem::Requirement.new(">= 2.5.0".freeze)
@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<hoe-highline>.freeze, ["~> 0.2"])
       s.add_development_dependency(%q<simplecov>.freeze, ["~> 0.7"])
       s.add_development_dependency(%q<rdoc-generator-fivefish>.freeze, ["~> 0.1"])
-      s.add_development_dependency(%q<rdoc>.freeze, ["~> 4.0"])
+      s.add_development_dependency(%q<rdoc>.freeze, ["~> 6.0"])
       s.add_development_dependency(%q<hoe>.freeze, ["~> 3.16"])
     else
       s.add_dependency(%q<loggability>.freeze, ["~> 0.11"])
@@ -40,7 +40,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<hoe-highline>.freeze, ["~> 0.2"])
       s.add_dependency(%q<simplecov>.freeze, ["~> 0.7"])
       s.add_dependency(%q<rdoc-generator-fivefish>.freeze, ["~> 0.1"])
-      s.add_dependency(%q<rdoc>.freeze, ["~> 4.0"])
+      s.add_dependency(%q<rdoc>.freeze, ["~> 6.0"])
       s.add_dependency(%q<hoe>.freeze, ["~> 3.16"])
     end
   else
@@ -50,7 +50,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<hoe-highline>.freeze, ["~> 0.2"])
     s.add_dependency(%q<simplecov>.freeze, ["~> 0.7"])
     s.add_dependency(%q<rdoc-generator-fivefish>.freeze, ["~> 0.1"])
-    s.add_dependency(%q<rdoc>.freeze, ["~> 4.0"])
+    s.add_dependency(%q<rdoc>.freeze, ["~> 6.0"])
     s.add_dependency(%q<hoe>.freeze, ["~> 3.16"])
   end
 end

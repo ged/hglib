@@ -19,6 +19,10 @@ This is a client library for the Mercurial distributed revision control tool
 that uses the [Command Server][cmdserver] for efficiency.
 
 
+### Examples
+
+
+
 ## Prerequisites
 
 * Ruby
