@@ -66,14 +66,14 @@ module Hglib
 	end
 
 
-	### Clone the +remote_repo+ to the specified +local_dir+, which defaults to a
-	### directory with the basename of the +remote_repo+ in the current working
+	### Clone the +source_repo+ to the specified +local_dir+, which defaults to a
+	### directory with the basename of the +source_repo+ in the current working
 	### directory.
-	def self::clone( remote_repo, local_dir=nil )
-		output = self.server( nil ).run( :clone, remote_repo, local_dir )
+	def self::clone( source_repo, local_dir=nil, **options )
+		output = self.server( nil ).run( :clone, source_repo, local_dir, **options )
 		self.log.debug "Clone output: %s" % [ output ]
 
-		local_dir ||= Pathname.pwd + File.basename( remote_repo )
+		local_dir ||= Pathname.pwd + File.basename( source_repo )
 		return self.repo( local_dir )
 	end
 

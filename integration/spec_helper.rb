@@ -1,12 +1,9 @@
 # -*- ruby -*-
 #encoding: utf-8
 
-require 'simplecov' if ENV['COVERAGE']
 require 'tmpdir'
+
 require 'rspec'
-
-require 'loggability/spechelpers'
-
 require 'hglib'
 
 RSpec.configure do |config|
@@ -29,6 +26,4 @@ RSpec.configure do |config|
 	config.filter_run_excluding( :requires_binary ) unless Hglib.hg_path.executable?
 
 	Kernel.srand( config.seed )
-
-	config.include( Loggability::SpecHelpers )
 end

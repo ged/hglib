@@ -1,3 +1,5 @@
-/html/
+coverage/
+empty_repo/
 ChangeLog
 spec/.status
+\.gem$

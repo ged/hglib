@@ -22,7 +22,7 @@ class Hglib::Server
 	# Array#pack template for commands sent to the command server
 	COMMAND_TEMPLATE = 'A*I>A*'
 
-	# Array#pack template for plain message sent to the command server
+	# Array#pack template for plain messages sent to the command server
 	MESSAGE_TEMPLATE = 'I>A*'
 
 
@@ -138,7 +138,7 @@ class Hglib::Server
 			when 'L'
 				self.log.debug "Server requested line input (%d bytes)" % [ data ]
 				input = self.get_line_input( data.to_i )
-				self.write_message( input )
+				self.write_message( input.chomp + "\n" )
 			when 'I'
 				self.log.debug "Server requested byte input (%d bytes)" % [ data ]
 				input = self.get_byte_input( data.to_i )
@@ -191,8 +191,9 @@ class Hglib::Server
 
 	### Stop the command server and clean up the pipes.
 	def stop
+		return unless self.started?
+
 		self.log.debug "Stopping."
-		self.write_message( '' ) # EOF
 		self.writer.close if self.writer
 		self.writer = nil
 		self.reader.close if self.reader
@@ -226,13 +227,6 @@ class Hglib::Server
 	end
 
 
-	### Read the cmdserver's banner.
-	def read_hello
-		_, message = self.read_message
-		self.log.debug "Hello message:\n%s" % [ message ]
-	end
-
-
 	### Write the specified message to the command server. Raises an exception if
 	### the server is not yet started.
 	def write_command( command, *args )
@@ -251,21 +245,29 @@ class Hglib::Server
 	end
 
 
+	### Read the cmdserver's banner.
+	def read_hello
+		_, message = self.read_message
+		self.log.debug "Hello message:\n%s" % [ message ]
+	end
+
+
 	### Read a single channel identifier and message from the command server. Raises
 	### an exception if the server is not yet started.
 	def read_message
 		raise "Server is not yet started" unless self.started?
 		header = self.reader.read( 5 ) or raise "Server aborted."
 		channel, bytes = header.unpack( HEADER_TEMPLATE )
-		# self.log.debug "Read channel %p message (%d bytes)" % [ channel, bytes ]
+		self.log.debug "Read channel %p message (%d bytes)" % [ channel, bytes ]
 
 		# Input requested; return the requested length as the message
 		if channel == 'I' || channel == 'L'
 			return channel, bytes
 		end
 
-		# self.log.debug "Reading %d more bytes of the message" % [ bytes ]
+		self.log.debug "Reading %d more bytes of the message" % [ bytes ]
 		message = self.reader.read( bytes ) unless bytes.zero?
+		self.log.debug "  read message: %p" % [ message ]
 		return channel, message
 	end
 
