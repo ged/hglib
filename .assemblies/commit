@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+ruby_version=$(cat .ruby-version)
+ruby_gemset=$(cat .ruby-gemset)
+rvm_version="${ruby_version}@${ruby_gemset}"
+
+rvm $rvm_version gemset import
+rvm-auto-ruby -S rspec -cfd
+
