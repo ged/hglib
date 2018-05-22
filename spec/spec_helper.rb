@@ -23,7 +23,7 @@ RSpec.configure do |config|
 	config.example_status_persistence_file_path = "spec/.status"
 	config.disable_monkey_patching!
 	config.warnings = true
-	config.profile_examples = 10
+	config.profile_examples = 5
 	config.order = :random
 
 	config.filter_run_excluding( :requires_binary ) unless Hglib.hg_path.executable?

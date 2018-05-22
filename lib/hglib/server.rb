@@ -154,26 +154,6 @@ class Hglib::Server
 	end
 
 
-	### Call the #on_line_input callback to read at most +max_bytes+. Raises an
-	### IOError if no callback is registered.
-	def get_line_input( max_bytes )
-		callback = self.line_input_callback or
-			raise IOError, "cannot read input: no line input callback registered"
-
-		return callback.call( max_bytes )
-	end
-
-
-	### Call the #on_byte_input callback to read at most +max_bytes+. Raises an
-	### IOError if no callback is registered.
-	def get_byte_input( max_bytes )
-		callback = self.byte_input_callback or
-			raise IOError, "cannot read input: no byte input callback registered"
-
-		return callback.call( max_bytes )
-	end
-
-
 	### Returns +true+ if the underlying command server has been started.
 	def is_started?
 		return self.pid ? true : false
@@ -199,6 +179,30 @@ class Hglib::Server
 		self.reader.close if self.reader
 		self.reader = nil
 		self.stop_server
+	end
+
+
+	#########
+	protected
+	#########
+
+	### Call the #on_line_input callback to read at most +max_bytes+. Raises an
+	### IOError if no callback is registered.
+	def get_line_input( max_bytes )
+		callback = self.line_input_callback or
+			raise IOError, "cannot read input: no line input callback registered"
+
+		return callback.call( max_bytes )
+	end
+
+
+	### Call the #on_byte_input callback to read at most +max_bytes+. Raises an
+	### IOError if no callback is registered.
+	def get_byte_input( max_bytes )
+		callback = self.byte_input_callback or
+			raise IOError, "cannot read input: no byte input callback registered"
+
+		return callback.call( max_bytes )
 	end
 
 

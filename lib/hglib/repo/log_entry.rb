@@ -18,23 +18,39 @@ require 'hglib/repo' unless defined?( Hglib::Repo )
 
 # An entry in a repository's revision log.
 class Hglib::Repo::LogEntry
+	extend Loggability
+
+
+	# Loggability API -- output to the hglib logger
+	log_to :hglib
+
 
 	### Parse a new LogEntry from the raw_entry (a UTF-8 String)
 	def self::parse( raw_entry )
-		raw_metadata, body = raw_entry.split( "\n\n" )
-		metadata = raw_metadata.each_line.inject({}) do |hash, line|
+		header, body = raw_entry.split( "\n\n" )
+		metadata = self.parse_log_header( header )
+
+		return self.new( metadata, body )
+	end
+
+
+	### Parse the given log +header+ and return the metadata from it as a Hash.
+	def self::parse_log_header( header )
+
+		# Ensure bookmarks and tags are always an array
+		metadata = { tag: [], bookmark: [] }
+
+		return header.each_line.with_object( metadata ) do |line, hash|
 			key, value = line.split( /:\s*/, 2 )
 			key = key.to_sym
 
 			if hash.key?( key )
 				hash[ key ] = Array( hash[key] )
-				hash[ key ].push( value )
+				hash[ key ].push( value.strip )
 			else
-				hash[ key ] = value
+				hash[ key ] = value.strip
 			end
 		end
-
-		return self.new( )
 	end
 
 
@@ -59,11 +75,9 @@ class Hglib::Repo::LogEntry
 
 
 	### Declare a reader for a value of the metadata.
-	def self::def_metadata_reader( *names )
-		names.each do |name|
-			reader = lambda { self.metadata[name] }
-			define_method( name, &reader )
-		end
+	def self::def_metadata_reader( method_name, key=method_name )
+		reader = lambda { self.metadata[key] }
+		define_method( method_name, &reader )
 	end
 
 
@@ -79,10 +93,36 @@ class Hglib::Repo::LogEntry
 	# The log summary for the entry
 	def_metadata_reader :summary
 
+	##
+	# The tags associated with the entry's revision
+	def_metadata_reader :tags, :tag
+
+	##
+	# The bookmarks currently associated with the entry's revision
+	def_metadata_reader :bookmarks, :bookmark
+
 
 	### The Time the revision associated with the entry was committed
 	def date
 		return Time.parse( self.metadata[:date] )
+	end
+	alias_method :time, :date
+
+
+	### Return a human-readable representation of the LogEntry as a String.
+	def inspect
+		parts = []
+		parts += self.tags.map {|t| "##{t}" }
+		parts += self.bookmarks.map {|b| "@#{b}" }
+
+		return "#<%p:#%x %s {%s} %p%s>" % [
+			self.class,
+			self.object_id * 2,
+			self.changeset,
+			self.date,
+			self.summary,
+			parts.empty? ? '' : " " + parts.join(' ')
+		]
 	end
 
 end # class Hglib::Repo::LogEntry
