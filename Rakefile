@@ -84,6 +84,7 @@ end
 task :gemspec => GEMSPEC
 file GEMSPEC => __FILE__
 task GEMSPEC do |task|
+	Rake.application.trace "Rebuilding gemspec."
 	spec = $hoespec.spec
 	spec.files.delete( '.gemtest' )
 	spec.signing_key = nil

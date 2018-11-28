@@ -1,24 +1,24 @@
 # -*- encoding: utf-8 -*-
-# stub: hglib 0.1.pre20180129173049 ruby lib
+# stub: hglib 0.1.pre20180523095904 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "hglib".freeze
-  s.version = "0.1.pre20180129173049"
+  s.version = "0.1.pre20180523095904"
 
   s.required_rubygems_version = Gem::Requirement.new("> 1.3.1".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Michael Granger".freeze]
   s.cert_chain = ["certs/ged.pem".freeze]
-  s.date = "2018-01-30"
+  s.date = "2018-05-23"
   s.description = "This is a client library for the Mercurial distributed revision control tool\nthat uses the [Command Server][cmdserver] for efficiency.".freeze
   s.email = ["ged@FaerieMUD.org".freeze]
   s.extra_rdoc_files = ["History.md".freeze, "LICENSE.txt".freeze, "Manifest.txt".freeze, "README.md".freeze, "History.md".freeze, "README.md".freeze]
-  s.files = [".simplecov".freeze, "ChangeLog".freeze, "History.md".freeze, "LICENSE.txt".freeze, "Manifest.txt".freeze, "README.md".freeze, "Rakefile".freeze, "lib/hglib.rb".freeze, "spec/hglib_spec.rb".freeze, "spec/spec_helper.rb".freeze]
+  s.files = [".simplecov".freeze, "ChangeLog".freeze, "History.md".freeze, "LICENSE.txt".freeze, "Manifest.txt".freeze, "README.md".freeze, "Rakefile".freeze, "examples/clone.rb".freeze, "integration/commands/clone_spec.rb".freeze, "integration/spec_helper.rb".freeze, "lib/hglib.rb".freeze, "lib/hglib/repo.rb".freeze, "lib/hglib/repo/id.rb".freeze, "lib/hglib/repo/log_entry.rb".freeze, "lib/hglib/server.rb".freeze, "spec/.status".freeze, "spec/hglib/repo/id_spec.rb".freeze, "spec/hglib/repo/log_entry_spec.rb".freeze, "spec/hglib/repo_spec.rb".freeze, "spec/hglib/server_spec.rb".freeze, "spec/hglib_spec.rb".freeze, "spec/spec_helper.rb".freeze]
   s.homepage = "http://deveiate.org/projects/hglib".freeze
   s.licenses = ["BSD-3-Clause".freeze]
   s.rdoc_options = ["--main".freeze, "README.md".freeze]
   s.required_ruby_version = Gem::Requirement.new(">= 2.5.0".freeze)
-  s.rubygems_version = "2.7.4".freeze
+  s.rubygems_version = "2.7.6".freeze
   s.summary = "This is a client library for the Mercurial distributed revision control tool that uses the [Command Server][cmdserver] for efficiency.".freeze
 
   if s.respond_to? :specification_version then
