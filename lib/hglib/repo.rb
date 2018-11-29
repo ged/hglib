@@ -1,6 +1,7 @@
 # -*- ruby -*-
 # frozen_string_literal: true
 
+require 'json'
 require 'loggability'
 require 'hglib' unless defined?( Hglib )
 
@@ -44,7 +45,7 @@ class Hglib::Repo
 	### requested statuses.
 	def status( *args, **options )
 		response = self.server.run( :status, *args, **options )
-		Loggability[ self ].debug "Parsing status response: %p" % [ response ]
+		self.logger.debug "Parsing status response: %p" % [ response ]
 
 		return {} if response.length == 1 && response.first.empty?
 		return response.each_slice( 2 ).inject({}) do |hash, (raw_status, path)|
@@ -63,7 +64,7 @@ class Hglib::Repo
 		options[:rev] = revision if revision
 
 		response = self.server.run( :id, **options )
-		Loggability[ self ].debug "Got ID response: %p" % [ response ]
+		self.logger.debug "Got ID response: %p" % [ response ]
 
 		return Hglib::Repo::Id.parse( response.first )
 	end
@@ -72,8 +73,22 @@ class Hglib::Repo
 	### Return an Array of Hglib::Repo::LogEntry objects that describes the revision
 	### history of the specified +files+ or the entire project.
 	def log( *files, **options )
-		rawlog = self.server.run( :log, *files, **options )
-		return rawlog.map {|entry| Hglib::Repo::LogEntry.parse(entry) }
+		options[:graph] = false
+		options[:T] = 'json'
+
+		jsonlog = self.server.run( :log, *files, **options )
+		entries = JSON.parse( jsonlog.join )
+
+		return entries.map {|entry| Hglib::Repo::LogEntry.new(entry) }
+	end
+
+
+	### Commit the specified +files+ with the given +options+.
+	def commit( *files, **options )
+		response = self.server.run( :commit, *files, **options )
+		self.logger.debug "Got COMMIT response: %p" % [ response ]
+
+		return true
 	end
 
 
@@ -84,6 +99,12 @@ class Hglib::Repo
 	### Create an Hglib::Server for this Repo.
 	def create_server
 		return Hglib::Server.new( self.path.to_s )
+	end
+
+
+	### Return the logger for this object; aliased to avoid the conflict with `hg log`.
+	def logger
+		return Loggability[ self ]
 	end
 
 end # class Hglib::Repo

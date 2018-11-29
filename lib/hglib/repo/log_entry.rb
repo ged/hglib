@@ -6,16 +6,6 @@ require 'time'
 require 'hglib/repo' unless defined?( Hglib::Repo )
 
 
-# changeset:   1:81f357f730d9
-# user:        Michael Granger <ged@FaerieMUD.org>
-# date:        Wed Jan 24 08:41:13 2018 -0800
-# summary:     Make ruby-version less specific
-#
-# changeset:   0:d6c97f99b012
-# user:        Michael Granger <ged@FaerieMUD.org>
-# date:        Wed Jan 24 08:25:21 2018 -0800
-# summary:     Initial commit.
-
 # An entry in a repository's revision log.
 class Hglib::Repo::LogEntry
 	extend Loggability
@@ -25,39 +15,32 @@ class Hglib::Repo::LogEntry
 	log_to :hglib
 
 
-	### Parse a new LogEntry from the raw_entry (a UTF-8 String)
-	def self::parse( raw_entry )
-		header, body = raw_entry.split( "\n\n" )
-		metadata = self.parse_log_header( header )
+	# {
+	# 	"bookmarks" => [],
+	# 	"branch" => "default",
+	# 	"date" => [1527021225, 25200],
+	# 	"desc" => "Add Assemblage commit script",
+	# 	"node" => "4a1cbb9f8d56abd4e72aa2860eecef718dad48dd",
+	# 	"parents" => ["ac2b07cce0fc307e787a91b9e74b4514f7b71f09"],
+	# 	"phase" => "draft",
+	# 	"rev" => 7,
+	# 	"tags" => [],
+	# 	"user" => "Michael Granger <ged@FaerieMUD.org>"
+	# }
 
-		return self.new( metadata, body )
-	end
-
-
-	### Parse the given log +header+ and return the metadata from it as a Hash.
-	def self::parse_log_header( header )
-
-		# Ensure bookmarks and tags are always an array
-		metadata = { tag: [], bookmark: [] }
-
-		return header.each_line.with_object( metadata ) do |line, hash|
-			key, value = line.split( /:\s*/, 2 )
-			key = key.to_sym
-
-			if hash.key?( key )
-				hash[ key ] = Array( hash[key] )
-				hash[ key ].push( value.strip )
-			else
-				hash[ key ] = value.strip
-			end
-		end
-	end
-
-
-	### Create a new log entry.
-	def initialize( metadata, body=nil )
-		@metadata  = metadata
-		@body      = body
+	### Create a new log entry from the raw +entryhash+.
+	def initialize( entryhash )
+		@bookmarks = entryhash[ "bookmarks" ]
+		@branch    = entryhash[ "branch" ]
+		@date      = entryhash[ "date" ]
+		@desc      = entryhash[ "desc" ]
+		@node      = entryhash[ "node" ]
+		@parents   = entryhash[ "parents" ]
+		@phase     = entryhash[ "phase" ]
+		@rev       = entryhash[ "rev" ]
+		@tags      = entryhash[ "tags" ]
+		@user      = entryhash[ "user" ]
+		@date      = entryhash[ "date" ]
 	end
 
 
@@ -66,47 +49,58 @@ class Hglib::Repo::LogEntry
 	######
 
 	##
-	# The parsed headers of the entry
-	attr_reader :metadata
+	# Return the Array of bookmarks corresponding to the entry (if any)
+	attr_reader :bookmarks
 
 	##
-	# The body of the log entry (e.g., the diff in --patch mode)
-	attr_reader :body
-
-
-	### Declare a reader for a value of the metadata.
-	def self::def_metadata_reader( method_name, key=method_name )
-		reader = lambda { self.metadata[key] }
-		define_method( method_name, &reader )
-	end
-
+	# Return the name of the branch the commit is on
+	attr_reader :branch
 
 	##
-	# The short-form identifier for the entry's revision
-	def_metadata_reader :changeset
+	# Return the description from the entry
+	attr_reader :desc
+	alias_method :summary, :desc
 
 	##
-	# The user that committed the entry's revision
-	def_metadata_reader :user
+	# Return the node (changeset ID) from the entry
+	attr_reader :node
 
 	##
-	# The log summary for the entry
-	def_metadata_reader :summary
+	# Return the changeset IDs of the parents of the entry
+	attr_reader :parents
 
 	##
-	# The tags associated with the entry's revision
-	def_metadata_reader :tags, :tag
+	# Return the phase from the entry
+	attr_reader :phase
 
 	##
-	# The bookmarks currently associated with the entry's revision
-	def_metadata_reader :bookmarks, :bookmark
+	# Return the revision number from the entry
+	attr_reader :rev
+
+	##
+	# Return the Array of the entry's tags
+	attr_reader :tags
+
+	##
+	# Return the name and email of the committing user
+	attr_reader :user
+
+	##
+	# The diff of the commit, if --patch was specified.
+	attr_reader :diff
 
 
 	### The Time the revision associated with the entry was committed
 	def date
-		return Time.parse( self.metadata[:date] )
+		return Time.at( @date[0] )
 	end
 	alias_method :time, :date
+
+
+	### Return the shortened changeset ID (in the form {rev}:{shortnode})
+	def changeset
+		return "%d:%s" % [ self.rev, self.node[0,12] ]
+	end
 
 
 	### Return a human-readable representation of the LogEntry as a String.
