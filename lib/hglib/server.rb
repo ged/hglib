@@ -30,6 +30,30 @@ class Hglib::Server
 	log_to :hglib
 
 
+	### Turn the specified +opthash+ into an Array of command line options.
+	def self::mangle_options( **options )
+		return options.flat_map do |name, val|
+			prefix = name.length > 1 ? '--' : '-'
+			optname = "%s%s" % [ prefix, name.to_s.gsub(/_/, '-') ]
+
+			case val
+			when TrueClass
+				[ optname ]
+			when FalseClass, NilClass
+				[ optname.sub(/\A--/, '--no-') ] if optname.start_with?( '--' )
+			when String
+				if optname.start_with?( '--' )
+					[ "#{optname}=#{val}" ]
+				else
+					[ optname, val ]
+				end
+			else
+				raise ArgumentError, "can't handle command option: %p" % [{ name => val }]
+			end
+		end.compact
+	end
+
+
 	### Create a new Hglib::Server that will be invoked for the specified +repo+.
 	### Any additional +args+ given will be passed to the `hg serve` command
 	### on startup.
@@ -119,7 +143,7 @@ class Hglib::Server
 		output = []
 
 		args.compact!
-		args += mangle_options( options )
+		args += self.class.mangle_options( options )
 
 		self.write_command( 'runcommand', command, *args )
 
@@ -292,26 +316,5 @@ class Hglib::Server
 		return cmd
 	end
 
-
-	#######
-	private
-	#######
-
-	### Turn the specified +opthash+ into an Array of command line options.
-	def mangle_options( opthash )
-		return opthash.flat_map do |name, val|
-			prefix = name.length > 1 ? '--' : '-'
-			optname = "%s%s" % [ prefix, name.to_s.gsub(/_/, '-') ]
-
-			case val
-			when TrueClass, FalseClass, NilClass
-				[optname] if val
-			when String
-				[ "#{optname}=#{val}" ]
-			else
-				raise ArgumentError, "can't handle command option: %p" % [{ name => val }]
-			end
-		end.compact
-	end
 
 end # class Hglib::Server

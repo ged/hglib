@@ -52,6 +52,46 @@ RSpec.describe Hglib::Server do
 	end
 
 
+	describe "option-mangling" do
+
+		it "mangles single-letter keys into one-hyphen options" do
+			result = described_class.mangle_options( C: true, p: true, g: true )
+			expect( result ).to eq( %w[-C -p -g] )
+		end
+
+
+		it "mangles multi-letter keys into two-hyphen options" do
+			result = described_class.mangle_options( copies: true, patch: true )
+			expect( result ).to eq( %w[--copies --patch] )
+		end
+
+
+		it "drops single-letter keys with falsey values" do
+			result = described_class.mangle_options( g: false, p: nil )
+			expect( result ).to eq( [] )
+		end
+
+
+		it "negates multi-letter keys with falsey values" do
+			result = described_class.mangle_options( graph: false, patch: nil )
+			expect( result ).to eq( %w[--no-graph --no-patch] )
+		end
+
+
+		it "appends String values onto options with a space for single-letter keys" do
+			result = described_class.mangle_options( P: '165' )
+			expect( result ).to eq( %w[-P 165] )
+		end
+
+
+		it "appends String values onto options with an equal for multi-letter keys" do
+			result = described_class.mangle_options( prune: '165' )
+			expect( result ).to eq( %w[--prune=165] )
+		end
+
+	end
+
+
 	it "knows whether or not it has been started" do
 		parent_reader.write( hello_message )
 		parent_reader.rewind
@@ -120,6 +160,7 @@ RSpec.describe Hglib::Server do
 		server = described_class.new( repo_dir )
 		expect( server.stop ).to be_falsey
 	end
+
 
 end
 
