@@ -92,6 +92,24 @@ class Hglib::Repo
 	end
 
 
+	### Pull changes from the specified +source+ (which defaults to the +default+
+	### path) into the local repository.
+	def pull( source=nil, **options )
+		response = self.server.run( :pull, source, **options )
+		self.logger.debug "Got PULL response: %p" % [ response ]
+
+		return true
+	end
+
+
+	### Pull changes from the specified +source+ into the local repository and update
+	### to the new branch head if new descendents were pulled.
+	def pull_update( source=nil, **options )
+		options[:update] = true
+		return self.pull( source, **options )
+	end
+
+
 	#########
 	protected
 	#########

@@ -63,17 +63,38 @@ RSpec.describe Hglib::Repo do
 	it "can fetch the log of the repository" do
 		repo = described_class.new( repo_dir )
 
-		expect( server ).to receive( :run ).with( :log, {} ).
+		expect( server ).to receive( :run ).with( :log, {T: 'json', graph: false} ).
 			and_return([
-				"changeset:   1:81f357f730d9\n"\
-				"user:        Michael Granger <ged@FaerieMUD.org>\n"\
-				"date:        Wed Jan 24 08:41:13 2018 -0800\n"\
-				"summary:     Make ruby-version less specific\n\n",
-
-				"changeset:   0:d6c97f99b012\n"\
-				"user:        Michael Granger <ged@FaerieMUD.org>\n"\
-				"date:        Wed Jan 24 08:25:21 2018 -0800\n"\
-				"summary:     Initial commit.\n\n"
+				"[",
+				"\n {\n  \"bookmarks\": [],\n  \"branch\": \"default\",\n  \"date\": " +
+				"[1516812073, 28800],\n  \"desc\": \"Make ruby-version less specific\"," +
+				"\n  \"node\": \"81f357f730d9f22d560e4bd2790e7cf5aa5b7ec7\",\n  \"parents\":" +
+				" [\"d6c97f99b012199d9088e85bb0940147446c6a87\"],\n  \"phase\": \"public\",\n " +
+				" \"rev\": 1,\n  \"tags\": [],\n  \"user\": \"Michael Granger" +
+				" <ged@FaerieMUD.org>\"\n }",
+				",",
+				"\n {\n",
+				"  \"bookmarks\": []",
+				",\n",
+				"  \"branch\": \"default\"",
+				",\n",
+				"  \"date\": [1516811121, 28800]",
+				",\n",
+				"  \"desc\": \"Initial commit.\"",
+				",\n",
+				"  \"node\": \"d6c97f99b012199d9088e85bb0940147446c6a87\"",
+				",\n",
+				"  \"parents\": [\"0000000000000000000000000000000000000000\"]",
+				",\n",
+				"  \"phase\": \"public\"",
+				",\n",
+				"  \"rev\": 0",
+				",\n",
+				"  \"tags\": []",
+				",\n",
+				"  \"user\": \"Michael Granger <ged@FaerieMUD.org>\"",
+				"\n }",
+				"\n]\n"
 			])
 
 		result = repo.log

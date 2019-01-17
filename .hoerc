@@ -1,5 +1,5 @@
 --- 
-exclude: !ruby/regexp /tmp$|CVS|Gemfile(\.lock)?|TAGS|tmtags|\.(idea|state|hg|svn|git|hoerc|env|DS_Store|rvm(rc|\.gems)|gems|irbrc|pryrc|tm_.*|rspec.*|rbx|travis\.yml|gems|document|editorconfig)|(logs|coverage|benchmarks|experiments|manual|features|tmp\w*|wiki|\w+-\d+\.\d+\.\d+)\/|\.(bundle|sqlite|ru|graffle|espressostorage|esproj|ldif|log|sublime-\w+|pid|pem|gemspec|rl)|etc/config\.yml$/
+exclude: !ruby/regexp /tmp$|CVS|Gemfile(\.lock)?|TAGS|tmtags|\.(assemblies|idea|state|hg|svn|git|hoerc|env|DS_Store|rvm(rc|\.gems)|gems|irbrc|pryrc|tm_.*|rspec.*|rbx|travis\.yml|gems|document|editorconfig)|(logs|coverage|benchmarks|experiments|manual|features|tmp\w*|wiki|\w+-\d+\.\d+\.\d+)\/|\.(bundle|sqlite|ru|graffle|espressostorage|esproj|ldif|log|sublime-\w+|pid|pem|gemspec|rl)|etc/config\.yml$/
 signing_key_file: /Volumes/Keys and Things/ged-private_gem_key.pem
 signing_cert_file: ~/.gem/gem-public_cert.pem
 publish_on_announce: true
