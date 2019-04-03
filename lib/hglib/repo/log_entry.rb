@@ -41,6 +41,7 @@ class Hglib::Repo::LogEntry
 		@tags      = entryhash[ "tags" ]
 		@user      = entryhash[ "user" ]
 		@date      = entryhash[ "date" ]
+		@files     = entryhash[ "files" ] || []
 	end
 
 
@@ -88,6 +89,10 @@ class Hglib::Repo::LogEntry
 	##
 	# The diff of the commit, if --patch was specified.
 	attr_reader :diff
+
+	##
+	# The files affected by the commit, if run with `verbose: true`.
+	attr_reader :files
 
 
 	### The Time the revision associated with the entry was committed
