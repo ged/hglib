@@ -54,6 +54,7 @@ class Hglib::Repo
 			hash
 		end
 	end
+	alias_method :stat, :status
 
 
 	### Return a Hglib::Repo::Id that identifies the repository state at the
