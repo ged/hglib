@@ -60,6 +60,15 @@ module Hglib
 	end
 
 
+	### Returns +true+ if the specified +dir+ looks like it is a Mercurial
+	### repository.
+	def self::is_repo?( dir )
+		dir = Pathname( dir )
+		hgdir = dir + '.hg'
+		return dir.directory? && hgdir.directory?
+	end
+
+
 	### Return an Hglib::Repo object for the specified +path+.
 	def self::repo( path='.' )
 		return Hglib::Repo.new( path )
@@ -75,6 +84,16 @@ module Hglib
 
 		local_dir ||= Pathname.pwd + File.basename( source_repo )
 		return self.repo( local_dir )
+	end
+
+
+	### Initialize a repository in the given +dir+ and return a Hglib::Repo
+	### for it.
+	def self::init( dir, **options )
+		output = self.server( nil ).run( :init, dir, **options )
+		self.log.debug "Init output: %s" % [ output ]
+
+		return self.repo( dir )
 	end
 
 end # module Hglib
