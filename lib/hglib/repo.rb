@@ -44,14 +44,14 @@ class Hglib::Repo
 	### the file. An empty Hash is returned if there are no files with one of the
 	### requested statuses.
 	def status( *args, **options )
-		response = self.server.run( :status, *args, **options )
+		response = self.server.run_with_json_template( :status, *args, **options )
 		self.logger.debug "Parsing status response: %p" % [ response ]
 
-		return {} if response.length == 1 && response.first.empty?
-		return response.each_slice( 2 ).inject({}) do |hash, (raw_status, path)|
-			path = Pathname( path.chomp )
-			hash[ path ] = raw_status.strip
-			hash
+		# return {} if response.length == 1 && response.first.empty?
+		return response.each_with_object({}) do |entry, hash|
+			self.logger.debug "Adding entry: %p to the status hash." % [ entry ]
+			pathname = Pathname( entry['path'] )
+			hash[ pathname ] = entry['status']
 		end
 	end
 	alias_method :stat, :status
@@ -64,10 +64,11 @@ class Hglib::Repo
 		options = {}
 		options[:rev] = revision if revision
 
-		response = self.server.run( :id, **options )
+		response = self.server.run_with_json_template( :id, **options )
+		data = response.first.transform_keys( &:to_sym )
 		self.logger.debug "Got ID response: %p" % [ response ]
 
-		return Hglib::Repo::Id.parse( response.first )
+		return Hglib::Repo::Id.new( **data )
 	end
 
 
@@ -75,13 +76,51 @@ class Hglib::Repo
 	### history of the specified +files+ or the entire project.
 	def log( *files, **options )
 		options[:graph] = false
-		options[:T] = 'json'
 
-		jsonlog = self.server.run( :log, *files, **options )
-		entries = JSON.parse( jsonlog.join )
+		entries = self.server.run_with_json_template( :log, *files, **options )
 
 		return entries.map {|entry| Hglib::Repo::LogEntry.new(entry) }
 	end
+
+
+	### Schedule the given +files+ to be version controlled and added to the 
+	### repository on the next commit. To undo an add before that, see #forget.
+	###
+	### If no +files+ are given, add all files to the repository (except files
+	### matching ".hgignore").
+	###
+	### Returns <code>true</code> if all files are successfully added.
+	def add( *files, **options )
+		response = self.server.run( :add, *files, **options )
+		self.logger.debug "Got ADD response: %p" % [ response ]
+
+		return true
+	end
+
+
+	### Add all new files and remove all missing files from the repository.
+	###
+	### Unless +files+ are given, new files are ignored if they match any of the
+	### patterns in ".hgignore". As with #add, these changes take effect at the
+	### next commit.
+	###
+	### Use the :similarity option to detect renamed files. This option takes a
+	### percentage between 0 (disabled) and 100 (files must be identical) as its
+	### value. With a value greater than 0, this compares every removed file with
+	### every added file and records those similar enough as renames. Detecting
+	### renamed files this way can be expensive. After using this option, you can
+	### call #status with the <code>:copies</code> options to check which files
+	### were identified as moved or renamed. If not specified, :similarity defaults
+	### to 100 and only renames of identical files are detected.
+	###
+	### Returns true if all files are successfully added.
+	def addremove( *files, **options )
+		response = self.server.run( :addremove, *files, **options )
+		self.logger.debug "Got ADD response: %p" % [ response ]
+
+		return true
+	end
+	alias_method :add_remove, :addremove
 
 
 	### Commit the specified +files+ with the given +options+.
@@ -109,6 +148,17 @@ class Hglib::Repo
 		options[:update] = true
 		return self.pull( source, **options )
 	end
+
+
+	### Fetch the current global Mercurial config and return it as an Hglib::Config
+	### object.
+	def config( untrusted: false )
+		options = { untrusted: untrusted }
+
+		config = self.server.run_with_json_template( :showconfig, **options )
+		return Hglib::Config.from_config_hash( config )
+	end
+
 
 
 	#########

@@ -35,7 +35,7 @@ hoespec = Hoe.spec 'hglib' do |spec|
 
 	spec.dependency 'hoe-deveiate',            '~> 0.10', :developer
 	spec.dependency 'simplecov',               '~> 0.7', :developer
-	spec.dependency 'rdoc-generator-fivefish', '~> 0.1', :developer
+	spec.dependency 'rdoc-generator-sixfish',  '~> 0', :developer
 	spec.dependency 'rdoc',                    '~> 6.0', :developer
 
 	spec.require_ruby_version( '>=2.5.0' )
@@ -74,7 +74,7 @@ if File.directory?( '.hg' )
 	    rdoc.main = "README.rdoc"
 		rdoc.markup = 'markdown'
 	    rdoc.rdoc_files.include( "*.rdoc", "ChangeLog", "lib/**/*.rb" )
-	    rdoc.generator = :fivefish
+	    rdoc.generator = :sixfish
 		rdoc.title = 'hglib'
 	    rdoc.rdoc_dir = 'doc'
 	end

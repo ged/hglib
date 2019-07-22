@@ -2,34 +2,24 @@
 # frozen_string_literal: true
 
 require 'hglib/repo' unless defined?( Hglib::Repo )
+require 'hglib/mixins'
 
 
 # The identification of a particular revision of a repository.
 class Hglib::Repo::Id
-
-	### Parse the given +raw_id+ and return a new Id that contains the parsed
-	### information.
-	def self::parse( raw_id )
-		global, tags, bookmarks = raw_id.chomp.split( ' ', 3 )
-		has_plus = global.chomp!( '+' ) ? true : false
-
-		tags ||= ''
-		tags = tags.split( '/' )
-
-		bookmarks ||= ''
-		bookmarks = bookmarks.split( '/' )
-
-		return self.new( global, *tags, uncommitted_changes: has_plus, bookmarks: bookmarks )
-	end
+	extend Hglib::MethodUtilities
 
 
 	### Create a new repository ID with the given +global+ revision identifier, one
 	### or more +tags+, and other options.
-	def initialize( global, *tags, uncommitted_changes: false, bookmarks: [] )
-		@global = global
-		@tags = tags
+	def initialize( id:, branch:, node:, dirty: false, parents: [], tags: [], bookmarks: [] )
+		@id = id
+		@branch = branch
+		@node = node
+		@dirty = dirty
+		@tags = Array( tags )
+		@parents = Array( parents )
 		@bookmarks = Array( bookmarks )
-		@uncommitted_changes = uncommitted_changes
 	end
 
 
@@ -38,8 +28,26 @@ class Hglib::Repo::Id
 	######
 
 	##
-	# The repo's global (short-form) revision identifier.
-	attr_reader :global
+	# The long-form revision ID
+	attr_reader :id
+
+	##
+	# The name of the current branch
+	attr_reader :branch
+
+	##
+	# The ID of the current
+	attr_reader :node
+
+	##
+	# The current IDs of the current revision's parent(s).
+	attr_reader :parents
+
+	##
+	# Does the repo have uncommitted changes?
+	attr_predicate :dirty
+	alias_method :dirty?, :uncommitted_changes?
+	alias_method :dirty?, :has_uncommitted_changes?
 
 	##
 	# The tags belonging to the revision of the repo.
@@ -48,13 +56,6 @@ class Hglib::Repo::Id
 	##
 	# The bookmarks set on the revision of the repo.
 	attr_reader :bookmarks
-
-
-	### Returns +true+ if the repo's working directory has uncommitted changes.
-	def uncommitted_changes?
-		return @uncommitted_changes
-	end
-	alias_method :has_uncommitted_changes?, :uncommitted_changes?
 
 
 	### Return the ID as a String in the form used by the command line.

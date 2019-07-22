@@ -19,29 +19,51 @@ RSpec.describe Hglib::Repo do
 	end
 
 
+	it "returns an empty Hash if the working directory is clean" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run_with_json_template ).
+			with( :status, {} ).
+			and_return( [] )
+
+		result = repo.status
+
+		expect( result ).to be_a( Hash ).and be_empty
+	end
+
+
 	it "can fetch the status of the working directory" do
 		repo = described_class.new( repo_dir )
 
-		expect( server ).to receive( :run ).with( :status, {} ).
+		expect( server ).to receive( :run_with_json_template ).
+			with( :status, {} ).
 			and_return([
-				"M ",
-				".gems\n",
-				"M ",
-				"lib/hglib/repo.rb\n",
-				"M ",
-				"lib/hglib/server.rb\n",
-				"? ",
-				"coverage/assets/0.10.2/magnify.png\n"
+				{
+					"path" => "lib/hglib/repo.rb",
+					"status" => "!"
+				},
+				{
+					"path" => "a_new_file.txt",
+					"status" => "?"
+				},
+				{
+					"path" => "doc/created.rid",
+					"status" => "?"
+				},
+				{
+					"path" => "lib/hglib/bepo.rb",
+					"status" => "?"
+				}
 			])
 
 		result = repo.status
 
 		expect( result ).to be_a( Hash )
 		expect( result ).to include(
-			Pathname('.gems') => 'M',
-			Pathname('lib/hglib/repo.rb') => 'M',
-			Pathname('lib/hglib/server.rb') => 'M',
-			Pathname('coverage/assets/0.10.2/magnify.png') => '?'
+			Pathname('lib/hglib/repo.rb') => "!",
+			Pathname('a_new_file.txt')    => "?",
+			Pathname('doc/created.rid')   => "?",
+			Pathname('lib/hglib/bepo.rb') => "?"
 		)
 	end
 
@@ -49,7 +71,8 @@ RSpec.describe Hglib::Repo do
 	it "can fetch the identification of the repository's current revision" do
 		repo = described_class.new( repo_dir )
 
-		expect( server ).to receive( :run ).with( :id, {} ).
+		expect( server ).to receive( :run ).
+			with( :id, {} ).
 			and_return( ["80d775fc1d2c+ qbase/qtip/repo-features.patch/tip master\n"] )
 
 		result = repo.id
@@ -63,43 +86,81 @@ RSpec.describe Hglib::Repo do
 	it "can fetch the log of the repository" do
 		repo = described_class.new( repo_dir )
 
-		expect( server ).to receive( :run ).with( :log, {T: 'json', graph: false} ).
+		expect( server ).to receive( :run_with_json_template ).
+			with( :log, {graph: false} ).
 			and_return([
-				"[",
-				"\n {\n  \"bookmarks\": [],\n  \"branch\": \"default\",\n  \"date\": " +
-				"[1516812073, 28800],\n  \"desc\": \"Make ruby-version less specific\"," +
-				"\n  \"node\": \"81f357f730d9f22d560e4bd2790e7cf5aa5b7ec7\",\n  \"parents\":" +
-				" [\"d6c97f99b012199d9088e85bb0940147446c6a87\"],\n  \"phase\": \"public\",\n " +
-				" \"rev\": 1,\n  \"tags\": [],\n  \"user\": \"Michael Granger" +
-				" <ged@FaerieMUD.org>\"\n }",
-				",",
-				"\n {\n",
-				"  \"bookmarks\": []",
-				",\n",
-				"  \"branch\": \"default\"",
-				",\n",
-				"  \"date\": [1516811121, 28800]",
-				",\n",
-				"  \"desc\": \"Initial commit.\"",
-				",\n",
-				"  \"node\": \"d6c97f99b012199d9088e85bb0940147446c6a87\"",
-				",\n",
-				"  \"parents\": [\"0000000000000000000000000000000000000000\"]",
-				",\n",
-				"  \"phase\": \"public\"",
-				",\n",
-				"  \"rev\": 0",
-				",\n",
-				"  \"tags\": []",
-				",\n",
-				"  \"user\": \"Michael Granger <ged@FaerieMUD.org>\"",
-				"\n }",
-				"\n]\n"
+				{
+					"bookmarks" => [],
+					"branch" => "default",
+					"date" => [1516812073, 28800],
+					"desc" => "Make ruby-version less specific",
+					"node" => "81f357f730d9f22d560e4bd2790e7cf5aa5b7ec7",
+					"parents" => ["d6c97f99b012199d9088e85bb0940147446c6a87"],
+					"phase" => "public",
+					"rev" => 1,
+					"tags" => [],
+					"user" => "Michael Granger <ged@FaerieMUD.org>"
+				},
+				{
+					"bookmarks" => [],
+					"branch" => "default",
+					"date" => [1516811121, 28800],
+					"desc" => "Initial commit.",
+					"node" => "d6c97f99b012199d9088e85bb0940147446c6a87",
+					"parents" => ["0000000000000000000000000000000000000000"],
+					"phase" => "public",
+					"rev" => 0,
+					"tags" => [],
+					"user" => "Michael Granger <ged@FaerieMUD.org>"
+				}
 			])
 
 		result = repo.log
 
 		expect( result ).to be_an( Array ).and( all be_a(Hglib::Repo::LogEntry) )
+	end
+
+
+	it "can return the current Mercurial configuration" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run_with_json_template ).
+			with( :showconfig, {untrusted: false} ).
+			and_return([
+				{
+					"name" => "progress.delay",
+					"source" => "/home/jrandom/.hgrc:96",
+					"value" => "0.1"
+				},
+				{
+					"name" => "progress.refresh",
+					"source" => "/home/jrandom/.hgrc:97",
+					"value" => "0.1"
+				},
+				{
+					"name" => "progress.format",
+					"source" => "/home/jrandom/.hgrc:98",
+					"value" => "topic bar number"
+				},
+				{
+					"name" => "progress.clear-complete",
+					"source" => "/home/jrandom/.hgrc:99",
+					"value" => "True"
+				}
+			])
+
+		result = repo.config
+
+		expect( result ).to be_a( Hglib::Config )
+		expect( result.progress ).to be_a( Hglib::Config::Item )
+		expect( result.progress.delay ).to be_a( Hglib::Config::Item )
+	end
+
+
+	it "can add new files to the repository" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run ).with( :add, )
 	end
 
 end

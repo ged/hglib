@@ -21,6 +21,12 @@ that uses the [Command Server][cmdserver] for efficiency.
 
 ### Examples
 
+    require 'hglib'
+
+    repo = Hglib.clone( 'https://bitbucket.org/sascrotch/hglib' )
+    # => #<Hglib::Repo:0x00007fae3880ec90 @path=#<Pathname:/Users/ged/temp/hglib>, @server=nil>
+
+
 
 
 ## Prerequisites

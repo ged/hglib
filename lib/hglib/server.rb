@@ -140,7 +140,7 @@ class Hglib::Server
 		self.start unless self.started?
 
 		done = false
-		output = []
+		output = String.new
 
 		args.compact!
 		args += self.class.mangle_options( options )
@@ -175,6 +175,17 @@ class Hglib::Server
 		end
 
 		return output
+	end
+
+
+	### Run the specified +command+ with the given +args+ with the JSON template and
+	### return the result.
+	def run_with_json_template( command, *args, **options )
+		options[:T] = 'json'
+
+		json = self.run( command, *args, **options )
+
+		return JSON.parse( json )
 	end
 
 

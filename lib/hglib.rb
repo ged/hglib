@@ -48,6 +48,7 @@ module Hglib
 
 
 	# Set up automatic loading of submodules
+	autoload :Config, 'hglib/config'
 	autoload :Server, 'hglib/server'
 	autoload :Repo, 'hglib/repo'
 
