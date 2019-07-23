@@ -10,13 +10,25 @@ class Hglib::Repo::Id
 	extend Hglib::MethodUtilities
 
 
+	# The SHA of the zeroth node
+	DEFAULT_ID = '0000000000000000000000000000000000000000'
+
+	# The default branch name to use
+	DEFAULT_BRANCH = 'default'
+
+	# The SHA of the node when the repo is at tip
+	DEFAULT_NODE = 'ffffffffffffffffffffffffffffffffffffffff'
+
+
 	### Create a new repository ID with the given +global+ revision identifier, one
 	### or more +tags+, and other options.
-	def initialize( id:, branch:, node:, dirty: false, parents: [], tags: [], bookmarks: [] )
-		@id = id
+	def initialize( id:, branch: DEFAULT_BRANCH, node: DEFAULT_NODE, dirty: false,
+		parents: [], tags: [], bookmarks: [] )
+
+		@id = id[ /\p{XDigit}{40}/ ]
 		@branch = branch
 		@node = node
-		@dirty = dirty
+		@dirty = dirty == '+'
 		@tags = Array( tags )
 		@parents = Array( parents )
 		@bookmarks = Array( bookmarks )
@@ -30,6 +42,7 @@ class Hglib::Repo::Id
 	##
 	# The long-form revision ID
 	attr_reader :id
+	alias_method :global, :id
 
 	##
 	# The name of the current branch
@@ -46,8 +59,8 @@ class Hglib::Repo::Id
 	##
 	# Does the repo have uncommitted changes?
 	attr_predicate :dirty
-	alias_method :dirty?, :uncommitted_changes?
-	alias_method :dirty?, :has_uncommitted_changes?
+	alias_method :uncommitted_changes?, :dirty?
+	alias_method :has_uncommitted_changes?, :dirty?
 
 	##
 	# The tags belonging to the revision of the repo.

@@ -39,20 +39,20 @@ RSpec.describe Hglib::Repo do
 			with( :status, {} ).
 			and_return([
 				{
-					"path" => "lib/hglib/repo.rb",
-					"status" => "!"
+					path: "lib/hglib/repo.rb",
+					status: "!"
 				},
 				{
-					"path" => "a_new_file.txt",
-					"status" => "?"
+					path: "a_new_file.txt",
+					status: "?"
 				},
 				{
-					"path" => "doc/created.rid",
-					"status" => "?"
+					path: "doc/created.rid",
+					status: "?"
 				},
 				{
-					"path" => "lib/hglib/bepo.rb",
-					"status" => "?"
+					path: "lib/hglib/bepo.rb",
+					status: "?"
 				}
 			])
 
@@ -71,15 +71,23 @@ RSpec.describe Hglib::Repo do
 	it "can fetch the identification of the repository's current revision" do
 		repo = described_class.new( repo_dir )
 
-		expect( server ).to receive( :run ).
+		expect( server ).to receive( :run_with_json_template ).
 			with( :id, {} ).
-			and_return( ["80d775fc1d2c+ qbase/qtip/repo-features.patch/tip master\n"] )
+			and_return( [{
+				bookmarks: ["v1.1", "live", "master"],
+				branch: "default",
+				dirty: "+",
+				id: "720c115412188539039b87baf57931fb5415a0bf+",
+				node: "ffffffffffffffffffffffffffffffffffffffff",
+				parents: ["720c115412188539039b87baf57931fb5415a0bf"],
+				tags: ["tip"]
+			}] )
 
 		result = repo.id
 
-		expect( result ).to be_a( Hglib::Repo::Id ).and( eq '80d775fc1d2c' )
-		expect( result.tags ).to eq( %w[qbase qtip repo-features.patch tip] )
-		expect( result.bookmarks ).to eq( %w[master] )
+		expect( result ).to be_a( Hglib::Repo::Id ).and( eq '720c115412188539039b87baf57931fb5415a0bf' )
+		expect( result.tags ).to eq( %w[tip] )
+		expect( result.bookmarks ).to eq( %w[v1.1 live master] )
 	end
 
 
@@ -90,28 +98,28 @@ RSpec.describe Hglib::Repo do
 			with( :log, {graph: false} ).
 			and_return([
 				{
-					"bookmarks" => [],
-					"branch" => "default",
-					"date" => [1516812073, 28800],
-					"desc" => "Make ruby-version less specific",
-					"node" => "81f357f730d9f22d560e4bd2790e7cf5aa5b7ec7",
-					"parents" => ["d6c97f99b012199d9088e85bb0940147446c6a87"],
-					"phase" => "public",
-					"rev" => 1,
-					"tags" => [],
-					"user" => "Michael Granger <ged@FaerieMUD.org>"
+					bookmarks: [],
+					branch: "default",
+					date: [1516812073, 28800],
+					desc: "Make ruby-version less specific",
+					node: "81f357f730d9f22d560e4bd2790e7cf5aa5b7ec7",
+					parents: ["d6c97f99b012199d9088e85bb0940147446c6a87"],
+					phase: "public",
+					rev: 1,
+					tags: [],
+					user: "Michael Granger <ged@FaerieMUD.org>"
 				},
 				{
-					"bookmarks" => [],
-					"branch" => "default",
-					"date" => [1516811121, 28800],
-					"desc" => "Initial commit.",
-					"node" => "d6c97f99b012199d9088e85bb0940147446c6a87",
-					"parents" => ["0000000000000000000000000000000000000000"],
-					"phase" => "public",
-					"rev" => 0,
-					"tags" => [],
-					"user" => "Michael Granger <ged@FaerieMUD.org>"
+					bookmarks: [],
+					branch: "default",
+					date: [1516811121, 28800],
+					desc: "Initial commit.",
+					node: "d6c97f99b012199d9088e85bb0940147446c6a87",
+					parents: ["0000000000000000000000000000000000000000"],
+					phase: "public",
+					rev: 0,
+					tags: [],
+					user: "Michael Granger <ged@FaerieMUD.org>"
 				}
 			])
 
@@ -128,24 +136,24 @@ RSpec.describe Hglib::Repo do
 			with( :showconfig, {untrusted: false} ).
 			and_return([
 				{
-					"name" => "progress.delay",
-					"source" => "/home/jrandom/.hgrc:96",
-					"value" => "0.1"
+					name: "progress.delay",
+					source: "/home/jrandom/.hgrc:96",
+					value: "0.1"
 				},
 				{
-					"name" => "progress.refresh",
-					"source" => "/home/jrandom/.hgrc:97",
-					"value" => "0.1"
+					name: "progress.refresh",
+					source: "/home/jrandom/.hgrc:97",
+					value: "0.1"
 				},
 				{
-					"name" => "progress.format",
-					"source" => "/home/jrandom/.hgrc:98",
-					"value" => "topic bar number"
+					name: "progress.format",
+					source: "/home/jrandom/.hgrc:98",
+					value: "topic bar number"
 				},
 				{
-					"name" => "progress.clear-complete",
-					"source" => "/home/jrandom/.hgrc:99",
-					"value" => "True"
+					name: "progress.clear-complete",
+					source: "/home/jrandom/.hgrc:99",
+					value: "True"
 				}
 			])
 
@@ -157,10 +165,13 @@ RSpec.describe Hglib::Repo do
 	end
 
 
-	it "can add new files to the repository" do
+	it "can add all new files to the repository" do
 		repo = described_class.new( repo_dir )
 
-		expect( server ).to receive( :run ).with( :add, )
+		expect( server ).to receive( :run ).with( :add, {} )
+
+		result = repo.add
+		expect( result ).to be_truthy
 	end
 
 end

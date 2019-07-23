@@ -26,9 +26,14 @@ RSpec.configure do |config|
 	config.profile_examples = 5
 	config.order = :random
 
-	config.filter_run_excluding( :requires_binary ) unless Hglib.hg_path.executable?
-
 	Kernel.srand( config.seed )
+
+	# Try environment variables if `hg` isn't in the PATH
+	if !Hglib.hg_path.executable?
+		Hglib.hg_path = ENV['HG_BINARY'] if ENV['HG_BINARY']
+		Hglib.hg_path = ENV['TM_HG'] if ENV['TM_HG']
+	end
+	config.filter_run_excluding( :requires_binary ) unless Hglib.hg_path.executable?
 
 	config.include( Loggability::SpecHelpers )
 end

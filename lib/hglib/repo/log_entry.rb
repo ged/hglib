@@ -30,18 +30,18 @@ class Hglib::Repo::LogEntry
 
 	### Create a new log entry from the raw +entryhash+.
 	def initialize( entryhash )
-		@bookmarks = entryhash[ "bookmarks" ]
-		@branch    = entryhash[ "branch" ]
-		@date      = entryhash[ "date" ]
-		@desc      = entryhash[ "desc" ]
-		@node      = entryhash[ "node" ]
-		@parents   = entryhash[ "parents" ]
-		@phase     = entryhash[ "phase" ]
-		@rev       = entryhash[ "rev" ]
-		@tags      = entryhash[ "tags" ]
-		@user      = entryhash[ "user" ]
-		@date      = entryhash[ "date" ]
-		@files     = entryhash[ "files" ] || []
+		@bookmarks = entryhash[ :bookmarks ]
+		@branch    = entryhash[ :branch ]
+		@date      = entryhash[ :date ]
+		@desc      = entryhash[ :desc ]
+		@node      = entryhash[ :node ]
+		@parents   = entryhash[ :parents ]
+		@phase     = entryhash[ :phase ]
+		@rev       = entryhash[ :rev ]
+		@tags      = entryhash[ :tags ]
+		@user      = entryhash[ :user ]
+		@date      = entryhash[ :date ]
+		@files     = entryhash[ :files ] || []
 	end
 
 

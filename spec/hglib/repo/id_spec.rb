@@ -2,16 +2,28 @@
 
 require_relative '../../spec_helper'
 
+require 'securerandom'
+require 'pathname'
 require 'hglib/repo/id'
 
 
-RSpec.describe Hglib::Repo::Id do
+RSpec.describe Hglib::Repo::Id, :requires_binary do
+
+	let( :repo_dir ) do
+		Pathname( Dir.mktmpdir(['hglib', 'repodir']) )
+	end
+	let( :repo ) { Hglib.init(repo_dir) }
+	let( :fake_sha ) { Random.bytes(20).unpack1('h*') }
+
 
 	it "can be created for an empty repo" do
-		result = described_class.new( '000000000000', 'tip' )
+		result = repo.id
 
-		expect( result.global ).to eq( '000000000000' )
-		expect( result ).to eq( '000000000000' )
+		expect( result.id ).to eq( described_class::DEFAULT_ID )
+		expect( result ).to eq( described_class::DEFAULT_ID )
+		expect( result.parents ).to contain_exactly( described_class::DEFAULT_ID )
+		expect( result.branch ).to eq( described_class::DEFAULT_BRANCH )
+		expect( result.node ).to eq( described_class::DEFAULT_NODE )
 		expect( result.tags ).to contain_exactly( 'tip' )
 		expect( result.bookmarks ).to be_empty
 		expect( result ).to_not have_uncommitted_changes
@@ -19,10 +31,17 @@ RSpec.describe Hglib::Repo::Id do
 
 
 	it "can be created for a repo with commits" do
-		result = described_class.new( 'd03a659966ec', 'tip' )
+		newfile = repo_dir + 'README.md'
+		newfile.write( <<~END_OF_FILE )
+		There is nothing to see here.
+		END_OF_FILE
 
-		expect( result.global ).to eq( 'd03a659966ec' )
-		expect( result ).to eq( 'd03a659966ec' )
+		repo.addr
+		repo.commit( message: "Add stuff." )
+
+		result = repo.id
+
+		expect( result.id ).to match( /\A\p{XDigit}{40}\z/ )
 		expect( result.tags ).to contain_exactly( 'tip' )
 		expect( result.bookmarks ).to be_empty
 		expect( result ).to_not have_uncommitted_changes
@@ -30,43 +49,26 @@ RSpec.describe Hglib::Repo::Id do
 
 
 	it "can be created for a repo with uncommitted changes" do
-		result = described_class.new( 'd03a659966ec', 'tip', uncommitted_changes: true )
+		newfile = repo_dir + 'README.md'
+		newfile.write( <<~END_OF_FILE )
+		There is more nothing to see here.
+		END_OF_FILE
 
-		expect( result.global ).to eq( 'd03a659966ec' )
+		repo.add
+		result = repo.id
+
+		expect( result.id ).to match( /\A\p{XDigit}{40}\z/ )
 		expect( result ).to have_uncommitted_changes
-	end
-
-
-	it "can be created for a repo with more than one tag" do
-		result = described_class.new( 'd03a659966ec', 'qbase', 'qtip', 'repo-features.patch', 'tip' )
-
-		expect( result.global ).to eq( 'd03a659966ec' )
-		expect( result.tags ).to contain_exactly( 'qbase', 'qtip', 'repo-features.patch', 'tip' )
-	end
-
-
-	it "can be created for a repo with a bookmark" do
-		result = described_class.new( 'd03a659966ec', 'tip', bookmarks: 'master' )
-
-		expect( result.global ).to eq( 'd03a659966ec' )
-		expect( result.bookmarks ).to contain_exactly( 'master' )
-	end
-
-
-	it "can be created for a repo with more than one bookmark" do
-		result = described_class.new( 'd03a659966ec', 'tip', bookmarks: ['master', 'github/master'] )
-
-		expect( result.global ).to eq( 'd03a659966ec' )
-		expect( result.bookmarks ).to contain_exactly( 'master', 'github/master' )
 	end
 
 
 	describe "equality" do
 
 		it "is equal to an object of the same class with the same values" do
-			id = described_class.new( 'd03a659966ec',
-				'qbase', 'qtip', 'repo-features.patch', 'tip',
-				uncommitted_changes: true,
+			id = described_class.new(
+				id: fake_sha,
+				tags: ['qbase', 'qtip', 'repo-features.patch', 'tip'],
+				dirty: '+',
 				bookmarks: ['master', 'live']
 			)
 
@@ -77,71 +79,9 @@ RSpec.describe Hglib::Repo::Id do
 
 
 		it "is equal to the String that contains the same revision identifier" do
-			id = described_class.new( 'd03a659966ec',
-				'qbase', 'qtip', 'repo-features.patch', 'tip',
-				uncommitted_changes: true,
-				bookmarks: ['master', 'live']
-			)
+			id = described_class.new( id: fake_sha )
 
-			expect( id ).to eq( 'd03a659966ec' )
-		end
-
-	end
-
-
-	describe "parsing server output" do
-
-		it "can parse the server output from an empty repo" do
-			result = described_class.parse( '000000000000 tip' )
-
-			expect( result.global ).to eq( '000000000000' )
-			expect( result ).to eq( '000000000000' )
-			expect( result.tags ).to contain_exactly( 'tip' )
-			expect( result.bookmarks ).to be_empty
-			expect( result ).to_not have_uncommitted_changes
-		end
-
-
-		it "can be parsed from the server output from a repo with commits" do
-			result = described_class.parse( 'd03a659966ec tip' )
-
-			expect( result.global ).to eq( 'd03a659966ec' )
-			expect( result ).to eq( 'd03a659966ec' )
-			expect( result.tags ).to contain_exactly( 'tip' )
-			expect( result.bookmarks ).to be_empty
-			expect( result ).to_not have_uncommitted_changes
-		end
-
-
-		it "can be parsed from the server output from a repo with uncommitted changes" do
-			result = described_class.parse( 'd03a659966ec+ tip' )
-
-			expect( result.global ).to eq( 'd03a659966ec' )
-			expect( result ).to have_uncommitted_changes
-		end
-
-
-		it "can be parsed from the server output from a repo with more than one tag" do
-			result = described_class.parse( 'd03a659966ec qbase/qtip/repo-features.patch/tip' )
-
-			expect( result.global ).to eq( 'd03a659966ec' )
-			expect( result.tags ).to contain_exactly( 'qbase', 'qtip', 'repo-features.patch', 'tip' )
-		end
-
-
-		it "can be parsed from the server output from a repo with a bookmark" do
-			result = described_class.parse( 'd03a659966ec tip master' )
-
-			expect( result.global ).to eq( 'd03a659966ec' )
-			expect( result.bookmarks ).to contain_exactly( 'master' )
-		end
-
-
-		it "can be parsed from the server output from a repo with more than one bookmark" do
-			result = described_class.parse( 'd03a659966ec tip master/servant' )
-
-			expect( result.global ).to eq( 'd03a659966ec' )
-			expect( result.bookmarks ).to contain_exactly( 'master', 'servant' )
+			expect( id ).to eq( fake_sha )
 		end
 
 	end
@@ -150,28 +90,51 @@ RSpec.describe Hglib::Repo::Id do
 	describe "stringifying" do
 
 		it "works for the ID of an empty repo" do
-			id = described_class.new( '000000000000', 'tip' )
+			id = repo.id
 
-			expect( id.to_s ).to eq( '000000000000 tip' )
+			expect( id.to_s ).to eq( '0000000000000000000000000000000000000000 tip' )
 		end
 
 
 		it "works for the ID of a repo with uncommitted changes" do
-			id = described_class.new( 'd03a659966ec', 'tip', uncommitted_changes: true )
+			newfile = repo_dir + 'README.md'
+			newfile.write( <<~END_OF_FILE )
+			So much less to see here.
+			END_OF_FILE
 
-			expect( id.to_s ).to eq( 'd03a659966ec+ tip' )
+			repo.add
+
+			id = repo.id
+
+			expect( id.to_s ).to match( /\A\p{XDigit}{40}\+ tip/ )
 		end
 
 
 		it "works for the ID of a repo with more than one tag" do
-			id = described_class.new( 'd03a659966ec', 'qbase', 'qtip', 'repo-features.patch', 'tip' )
+			newfile = repo_dir + 'README.md'
+			newfile.write( "A file." )
 
-			expect( id.to_s ).to eq( 'd03a659966ec qbase/qtip/repo-features.patch/tip' )
+			repo.add
+			repo.commit( message: "Added a README" )
+			repo.tag( "v1" )
+			repo.tag( "add_readme" )
+			repo.tag( "live" )
+
+			id = repo.id
+
+			expect( id.to_s ).to match( %r(\A\p{XDigit}{40} v1/add_readme/live) )
 		end
 
 
 		it "works for the ID of a repo with a bookmark" do
-			id = described_class.new( 'd03a659966ec', 'tip', bookmarks: 'master' )
+			newfile = repo_dir + 'README.md'
+			newfile.write( "A file." )
+
+			repo.add
+			repo.commit( message: "Added a README" )
+			repo.bookmark( "master" )
+
+			id = repo.id
 
 			expect( id.to_s ).to eq( 'd03a659966ec tip master' )
 		end

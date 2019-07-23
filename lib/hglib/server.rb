@@ -1,6 +1,7 @@
 # -*- ruby -*-
 # frozen_string_literal: true
 
+require 'json'
 require 'shellwords'
 require 'loggability'
 require 'hglib' unless defined?( Hglib )
@@ -180,12 +181,12 @@ class Hglib::Server
 
 	### Run the specified +command+ with the given +args+ with the JSON template and
 	### return the result.
-	def run_with_json_template( command, *args, **options )
+	def run_with_json_template( command, *args, symbolize: true, **options )
 		options[:T] = 'json'
 
 		json = self.run( command, *args, **options )
 
-		return JSON.parse( json )
+		return JSON.parse( json, symbolize_names: symbolize )
 	end
 
 
@@ -313,8 +314,11 @@ class Hglib::Server
 
 	### Return the command-line command for starting the command server.
 	def server_start_command
+		hg = Hglib.hg_path
+		raise "couldn't find an `hg' executable in your PATH!" unless hg.executable?
+
 		cmd = [
-			Hglib.hg_path.to_s,
+			hg.to_s,
 			'--config',
 			'ui.interactive=True',
 			'serve',
