@@ -66,7 +66,7 @@ RSpec.describe Hglib do
 
 
 		it "knows a repo dir is a repo dir", :requires_binary do
-			repo = described_class.init( repo_dir )
+			described_class.init( repo_dir )
 			expect( described_class.is_repo?(repo_dir) ).to be_truthy
 		end
 

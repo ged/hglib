@@ -16,6 +16,7 @@ class Hglib::Repo
 	autoload :Bookmark, 'hglib/repo/bookmark'
 	autoload :Id, 'hglib/repo/id'
 	autoload :LogEntry, 'hglib/repo/log_entry'
+	autoload :Tag, 'hglib/repo/tag'
 
 
 	### Create a new Repo object that will operate on the Mercurial repo at the
@@ -84,7 +85,7 @@ class Hglib::Repo
 	end
 
 
-	### Schedule the given +files+ to be version controlled and added to the 
+	### Schedule the given +files+ to be version controlled and added to the
 	### repository on the next commit. To undo an add before that, see #forget.
 	###
 	### If no +files+ are given, add all files to the repository (except files
@@ -152,6 +153,15 @@ class Hglib::Repo
 	end
 
 
+	### Update the working directory or switch revisions.
+	def update( rev=nil, **options )
+		response = self.server.run( :update, rev, **options )
+		self.logger.debug "Got UPDATE response: %p" % [ response ]
+
+		return true
+	end
+
+
 	### Name a revision using +names+.
 	def tag( *names, **options )
 		raise "expected at least one tag name" if names.empty?
@@ -168,7 +178,7 @@ class Hglib::Repo
 		response = self.server.run_with_json_template( :tags )
 		self.logger.debug "Got a TAGS response: %p" % [ response ]
 
-		return response.map {|tag| Hglib::Repo::Tag.new(self, **tag) }
+		return response.flatten.map {|tag| Hglib::Repo::Tag.new(self, **tag) }
 	end
 
 

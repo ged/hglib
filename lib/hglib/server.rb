@@ -137,6 +137,7 @@ class Hglib::Server
 	### #on_byte_input and #on_line_input will be used to read it. If one of these
 	### callbacks is not registered, an IOError will be raised.
 	def run( command, *args, **options )
+		args = args.compact
 		self.log.debug "Running command: %p" % [ Shellwords.join([command.to_s] + args) ]
 		self.start unless self.started?
 

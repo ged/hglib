@@ -160,8 +160,8 @@ RSpec.describe Hglib::Repo do
 		result = repo.config
 
 		expect( result ).to be_a( Hglib::Config )
-		expect( result.progress ).to be_a( Hglib::Config::Item )
-		expect( result.progress.delay ).to be_a( Hglib::Config::Item )
+		expect( result['progress.delay'] ).to eq( '0.1' )
+		expect( result['progress.format'] ).to eq( 'topic bar number' )
 	end
 
 

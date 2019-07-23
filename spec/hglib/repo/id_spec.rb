@@ -116,13 +116,12 @@ RSpec.describe Hglib::Repo::Id, :requires_binary do
 
 			repo.add
 			repo.commit( message: "Added a README" )
-			repo.tag( "v1" )
-			repo.tag( "add_readme" )
-			repo.tag( "live" )
+			repo.tag( "v1", "add_readme", "live" )
+			repo.update( rev: '-2' )
 
 			id = repo.id
 
-			expect( id.to_s ).to match( %r(\A\p{XDigit}{40} v1/add_readme/live) )
+			expect( id.to_s ).to match( %r(\A\p{XDigit}{40} add_readme/live/v1) )
 		end
 
 
@@ -136,7 +135,7 @@ RSpec.describe Hglib::Repo::Id, :requires_binary do
 
 			id = repo.id
 
-			expect( id.to_s ).to eq( 'd03a659966ec tip master' )
+			expect( id.to_s ).to match( %r(\A\p{XDigit}{40} tip master) )
 		end
 
 	end

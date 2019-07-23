@@ -1,6 +1,6 @@
 #!/usr/bin/ruby -*- ruby -*-
 
-$LOAD_PATH.unshift( 'lib' )
+$LOAD_PATH.unshift( File.expand_path 'lib' )
 
 begin
 	require 'hglib'

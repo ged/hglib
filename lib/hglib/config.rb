@@ -7,12 +7,15 @@ require 'hglib' unless defined?( Hglib )
 
 class Hglib::Config
 	extend Loggability
+	include Enumerable
+
+
+	# Config item type
+	Item = Struct.new( :value, :source )
+
 
 	# Log to the Hglib logger
 	log_to :hglib
-
-
-	Item = Struct.new( :value, :source )
 
 
 	### Create a new Config object from the given +config_items+.
@@ -20,24 +23,34 @@ class Hglib::Config
 		@items = self.expand_config_items( config_items )
 	end
 
-	{
-		:name=>"merge-tools.araxis.priority",
-		:source=>"/usr/local/Cellar/mercurial/5.0/lib/python2.7/site-packages/mercurial/default.d/mergetools.rc:127",
-		:value=>"-2"
-	},
-	{
-		:name=>"merge-tools.araxis.args",
-		:source=>"/usr/local/Cellar/mercurial/5.0/lib/python2.7/site-packages/mercurial/default.d/mergetools.rc:128",
-		:value=>"/3 /a2 /wait /merge /title1:\"Other\" /title2:\"Base\" /title3:\"Local :\"$local $other $base $local $output"
-	},
+
+	######
+	public
+	######
+
+	##
+	# The Hash of Hglib::Config::Items from the config, keyed by name.
+	attr_reader :items
+
+
+	### Fetch the value of the config item +key+.
+	def []( key )
+		return self.items[ key ]&.value
+	end
+
+
+	### Call the block once for each config item, yielding the key and the Item.
+	def each( &block )
+		return self.items.each( &block )
+	end
 
 
 	### Expand the Array of configuration +items+ such as that returned by the JSON
 	### template of `hg showconfig` and return a hierarchical Hash.
 	def expand_config_items( items )
-		return items.each_with_object( {} ) do |item, hash|
-			hash[ item[:name] ] = Item.new( *item.values_at(:value, :source) )
-			
+		return items.flatten.each_with_object( {} ) do |item, hash|
+			self.log.debug "Expanding %p" % [ item ]
+			hash[ item[:name] ] = Item.new( item[:value], item[:source] )
 		end
 	end
 

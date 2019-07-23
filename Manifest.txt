@@ -9,11 +9,17 @@ examples/clone.rb
 integration/commands/clone_spec.rb
 integration/spec_helper.rb
 lib/hglib.rb
+lib/hglib/config.rb
+lib/hglib/mixins.rb
 lib/hglib/repo.rb
+lib/hglib/repo/bookmark.rb
 lib/hglib/repo/id.rb
 lib/hglib/repo/log_entry.rb
+lib/hglib/repo/tag.rb
 lib/hglib/server.rb
 spec/.status
+spec/hglib/config_spec.rb
+spec/hglib/mixins_spec.rb
 spec/hglib/repo/id_spec.rb
 spec/hglib/repo/log_entry_spec.rb
 spec/hglib/repo_spec.rb
