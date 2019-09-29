@@ -16,6 +16,7 @@ class Hglib::Repo
 	autoload :Bookmark, 'hglib/repo/bookmark'
 	autoload :Id, 'hglib/repo/id'
 	autoload :LogEntry, 'hglib/repo/log_entry'
+	autoload :StatusEntry, 'hglib/repo/status_entry'
 	autoload :Tag, 'hglib/repo/tag'
 
 
@@ -49,12 +50,7 @@ class Hglib::Repo
 		response = self.server.run_with_json_template( :status, *args, **options )
 		self.logger.debug "Parsing status response: %p" % [ response ]
 
-		# return {} if response.length == 1 && response.first.empty?
-		return response.each_with_object({}) do |entry, hash|
-			self.logger.debug "Adding entry: %p to the status hash." % [ entry ]
-			pathname = Pathname( entry[:path] )
-			hash[ pathname ] = entry[:status]
-		end
+		return response.map {|entry| Hglib::Repo::StatusEntry.new(entry) }
 	end
 	alias_method :stat, :status
 

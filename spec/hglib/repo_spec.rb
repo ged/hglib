@@ -19,7 +19,7 @@ RSpec.describe Hglib::Repo do
 	end
 
 
-	it "returns an empty Hash if the working directory is clean" do
+	it "returns an empty Array if the working directory is clean" do
 		repo = described_class.new( repo_dir )
 
 		expect( server ).to receive( :run_with_json_template ).
@@ -28,7 +28,7 @@ RSpec.describe Hglib::Repo do
 
 		result = repo.status
 
-		expect( result ).to be_a( Hash ).and be_empty
+		expect( result ).to be_an( Array ).and be_empty
 	end
 
 
@@ -58,12 +58,13 @@ RSpec.describe Hglib::Repo do
 
 		result = repo.status
 
-		expect( result ).to be_a( Hash )
-		expect( result ).to include(
-			Pathname('lib/hglib/repo.rb') => "!",
-			Pathname('a_new_file.txt')    => "?",
-			Pathname('doc/created.rid')   => "?",
-			Pathname('lib/hglib/bepo.rb') => "?"
+		expect( result ).to be_an( Array )
+		expect( result ).to all( be_a Hglib::Repo::StatusEntry )
+		expect( result.map(&:path) ).to include(
+			Pathname('lib/hglib/repo.rb'),
+			Pathname('a_new_file.txt'),
+			Pathname('doc/created.rid'),
+			Pathname('lib/hglib/bepo.rb'),
 		)
 	end
 
