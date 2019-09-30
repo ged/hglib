@@ -130,6 +130,30 @@ RSpec.describe Hglib::Repo do
 	end
 
 
+	it "can fetch a diff of the current working copy of the repository" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run ).with( :diff, {} ).
+			and_return( "the diff" )
+
+		result = repo.diff
+
+		expect( result ).to eq( "the diff" )
+	end
+
+
+	it "can fetch a diff of particular files" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run ).with( :diff, 'README.md', 'Rakefile', {} ).
+			and_return( "two files diff" )
+
+		result = repo.diff( 'README.md', 'Rakefile' )
+
+		expect( result ).to eq( "two files diff" )
+	end
+
+
 	it "can return the current Mercurial configuration" do
 		repo = described_class.new( repo_dir )
 
@@ -163,6 +187,28 @@ RSpec.describe Hglib::Repo do
 		expect( result ).to be_a( Hglib::Config )
 		expect( result['progress.delay'] ).to eq( '0.1' )
 		expect( result['progress.format'] ).to eq( 'topic bar number' )
+	end
+
+
+	it "can fetch repo aliases" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run_with_json_template ).
+			with( :paths ).
+			and_return([
+				{name: 'sourcehut', url: 'ssh://hg@hg.sr.ht/~ged/hglib'},
+				{name: 'default', url: 'ssh://hg@deveiate.org/hglib'},
+				{name: 'github', url: 'git+ssh://git@github.com/ged/hglib.git'}
+			])
+
+		result = repo.paths
+
+		expect( result ).to be_a( Hash )
+		expect( result ).to eq(
+			sourcehut: URI('ssh://hg@hg.sr.ht/~ged/hglib'),
+			default: URI('ssh://hg@deveiate.org/hglib'),
+			github: URI('git+ssh://git@github.com/ged/hglib.git')
+		)
 	end
 
 

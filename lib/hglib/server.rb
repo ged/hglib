@@ -143,6 +143,7 @@ class Hglib::Server
 
 		done = false
 		output = String.new
+		errors = []
 
 		args.compact!
 		args += self.class.mangle_options( options )
@@ -160,7 +161,7 @@ class Hglib::Server
 				done = true
 			when 'e'
 				self.log.error "Got command error: %p" % [ data ]
-				raise Hglib::CommandError, data
+				errors << data
 			when 'L'
 				self.log.debug "Server requested line input (%d bytes)" % [ data ]
 				input = self.get_line_input( data.to_i )
@@ -175,6 +176,8 @@ class Hglib::Server
 				raise( msg ) if channel =~ /\p{Upper}/ # Mandatory
 			end
 		end
+
+		raise Hglib::CommandError, [command, *errors] unless errors.empty?
 
 		return output
 	end

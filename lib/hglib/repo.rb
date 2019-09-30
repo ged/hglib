@@ -76,8 +76,18 @@ class Hglib::Repo
 		options[:graph] = false
 
 		entries = self.server.run_with_json_template( :log, *files, **options )
+		self.logger.debug "Got log response: %p" % [ entries ]
 
 		return entries.map {|entry| Hglib::Repo::LogEntry.new(entry) }
+	end
+
+
+	### Return a String showing differences between revisions for the specified
+	### +files+ in the unified diff format.
+	def diff( *files, **options )
+		response = self.server.run( :diff, *files, **options )
+		self.logger.debug "Got diff response: %p" % [ truncate(response) ]
+		return response
 	end
 
 
@@ -158,6 +168,15 @@ class Hglib::Repo
 	end
 
 
+	### Push changes to the specified +destination+.
+	def push( destination=nil, **options )
+		response = self.server.run( :push, destination, **options )
+		self.log.debug "Got PUSH response: %p" % [ response ]
+
+		return true
+	end
+
+
 	### Name a revision using +names+.
 	def tag( *names, **options )
 		raise "expected at least one tag name" if names.empty?
@@ -209,6 +228,16 @@ class Hglib::Repo
 	end
 
 
+	### Fetch a Hash of aliases for remote repositories.
+	def paths
+		response = self.server.run_with_json_template( :paths )
+		self.logger.debug "Got a PATHS response: %p" % [ response ]
+
+		return response.each_with_object({}) do |entry, hash|
+			hash[ entry[:name].to_sym ] = URI( entry[:url] )
+		end
+	end
+
 
 	#########
 	protected
@@ -223,6 +252,18 @@ class Hglib::Repo
 	### Return the logger for this object; aliased to avoid the conflict with `hg log`.
 	def logger
 		return Loggability[ self ]
+	end
+
+
+	### Return the given +string+ with the middle truncated so that it's +maxlength+
+	### characters long if it exceeds that length.
+	def truncate( string, maxlength=80 )
+		return string if maxlength < 8
+		return string if string.length - maxlength - 5 <= 0
+
+		return string[0 .. (maxlength / 2) - 3 ] +
+			' ... ' +
+			string[ -((maxlength / 2) -3) .. ]
 	end
 
 end # class Hglib::Repo

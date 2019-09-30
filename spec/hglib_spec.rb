@@ -72,5 +72,47 @@ RSpec.describe Hglib do
 
 	end
 
+
+	describe "command error" do
+
+		### Rescue any (runtime) exception raised when yielding and return it. If no
+		### exception is raised, return nil.
+		def rescued
+			yield
+			return nil
+		rescue => err
+			return err
+		end
+
+
+		it "can be created with a single error message" do
+			exception = rescued {
+				raise Hglib::CommandError, [:status, "no_status: No such file or directory\n"]
+			}
+
+			expect( exception ).to_not be_multiple
+			expect( exception.message ).to eq( "`status`: no_status: No such file or directory" )
+		end
+
+
+		it "can be created with multiple error messages" do
+			exception = rescued {
+				raise Hglib::CommandError, [
+					:status,
+					"no_status: No such file or directory\n",
+					"unknown: No such file or directory\n"
+				]
+			}
+
+			expect( exception ).to be_multiple
+			expect( exception.message ).to eq( <<~ERROR_MESSAGE )
+				`status`: 
+				  - no_status: No such file or directory
+				  - unknown: No such file or directory
+			ERROR_MESSAGE
+		end
+
+	end
+
 end
 
