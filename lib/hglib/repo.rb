@@ -58,16 +58,14 @@ class Hglib::Repo
 	### Return a Hglib::Repo::Id that identifies the repository state at the
 	### specified +revision+, or the current revision if unspecified. A +revision+
 	### of `.` identifies the working directory parent without uncommitted changes.
-	def id( revision=nil )
-		options = {}
-		options[:rev] = revision if revision
-
-		response = self.server.run_with_json_template( :id, **options )
-		data = response.first
+	def identify( source=nil, **options )
+		response = self.server.run_with_json_template( :identify, source, **options )
 		self.logger.debug "Got ID response: %p" % [ response ]
 
+		data = response.first
 		return Hglib::Repo::Id.new( **data )
 	end
+	alias_method :id, :identify
 
 
 	### Return an Array of Hglib::Repo::LogEntry objects that describes the revision
