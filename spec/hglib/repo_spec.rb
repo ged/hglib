@@ -73,7 +73,7 @@ RSpec.describe Hglib::Repo do
 		repo = described_class.new( repo_dir )
 
 		expect( server ).to receive( :run_with_json_template ).
-			with( :id, {} ).
+			with( :identify, nil, {} ).
 			and_return( [{
 				bookmarks: ["v1.1", "live", "master"],
 				branch: "default",

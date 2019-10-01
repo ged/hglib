@@ -42,7 +42,7 @@ class Hglib::Server
 				[ optname ]
 			when FalseClass, NilClass
 				[ optname.sub(/\A--/, '--no-') ] if optname.start_with?( '--' )
-			when String
+			when String, Numeric
 				if optname.start_with?( '--' )
 					[ "#{optname}=#{val}" ]
 				else
@@ -145,9 +145,7 @@ class Hglib::Server
 		output = String.new
 		errors = []
 
-		args.compact!
 		args += self.class.mangle_options( options )
-
 		self.write_command( 'runcommand', command, *args )
 
 		until done
