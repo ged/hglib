@@ -169,7 +169,7 @@ class Hglib::Repo
 	### Push changes to the specified +destination+.
 	def push( destination=nil, **options )
 		response = self.server.run( :push, destination, **options )
-		self.log.debug "Got PUSH response: %p" % [ response ]
+		self.logger.debug "Got PUSH response: %p" % [ response ]
 
 		return true
 	end
