@@ -154,6 +154,16 @@ RSpec.describe Hglib::Repo do
 	end
 
 
+	it "can add all new files to the repository" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run ).with( :add, {} )
+
+		result = repo.add
+		expect( result ).to be_truthy
+	end
+
+
 	it "can return the current Mercurial configuration" do
 		repo = described_class.new( repo_dir )
 
@@ -212,13 +222,66 @@ RSpec.describe Hglib::Repo do
 	end
 
 
-	it "can add all new files to the repository" do
-		repo = described_class.new( repo_dir )
+	describe "version info" do
 
-		expect( server ).to receive( :run ).with( :add, {} )
+		let( :version_info ) {[{
+			extensions: [
+				{bundled: true, name: "churn", ver: nil},
+				{bundled: true, name: "convert", ver: nil},
+				{bundled: false, name: "evolve", ver: "9.2.0"},
+				{bundled: true, name: "extdiff", ver: nil},
+				{bundled: true, name: "gpg", ver: nil},
+				{bundled: false, name: "hggit", ver: "0.8.12 (dulwich 0.19.10)"},
+				{bundled: true, name: "strip", ver: nil},
+				{bundled: true, name: "mq", ver: nil},
+				{bundled: false, name: "prompt", ver: nil},
+				{bundled: true, name: "purge", ver: nil},
+				{bundled: true, name: "rebase", ver: nil},
+				{bundled: false, name: "topic", ver: "0.17.0"},
+				{bundled: true, name: "histedit", ver: nil}
+			],
+			ver: "5.1.1"
+		}]}
 
-		result = repo.add
-		expect( result ).to be_truthy
+		before( :each ) do
+			expect( server ).to receive( :run_with_json_template ).
+				with( :version ).
+				and_return( version_info )
+		end
+
+
+		it "can fetch the versions of Mercurial and loaded extensions" do
+			repo = described_class.new( repo_dir )
+
+			result = repo.versions
+
+			expect( result ).to eq( version_info.first )
+		end
+
+
+		it "can fetch the simple version of Mercurial" do
+			repo = described_class.new( repo_dir )
+
+			result = repo.version
+
+			expect( result ).to eq( version_info.first[:ver] )
+		end
+
+
+		it "can fetch the versions of all loaded Mercurial extensions" do
+			repo = described_class.new( repo_dir )
+
+			result = repo.extension_versions
+
+			expect( result ).to be_a( Hash )
+			expect( result ).to include(
+				churn: {bundled: true, ver: nil},
+				evolve: {bundled: false, ver: '9.2.0'},
+				topic: {bundled: false, ver: '0.17.0'},
+				hggit: {bundled: false, ver: "0.8.12 (dulwich 0.19.10)"}
+			)
+		end
+
 	end
 
 end
