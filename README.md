@@ -1,10 +1,10 @@
 # hglib
 
 home
-: http://bitbucket.org/ged/ruby-hglib
+: https://hg.sr.ht/~ged/hglib
 
 code
-: http://bitbucket.org/ged/ruby-hglib
+: https://hg.sr.ht/~ged/hglib
 
 github
 : https://github.com/ged/ruby-hglib
@@ -23,10 +23,8 @@ that uses the [Command Server][cmdserver] for efficiency.
 
     require 'hglib'
 
-    repo = Hglib.clone( 'https://bitbucket.org/sascrotch/hglib' )
+    repo = Hglib.clone( 'https://https://hg.sr.ht/~ged/hglib' )
     # => #<Hglib::Repo:0x00007fae3880ec90 @path=#<Pathname:/Users/ged/temp/hglib>, @server=nil>
-
-
 
 
 ## Prerequisites
@@ -42,20 +40,24 @@ that uses the [Command Server][cmdserver] for efficiency.
 ## Contributing
 
 You can check out the current development source with Mercurial via its
-[project page](http://bitbucket.org/ged/ruby-hglib). Or if you prefer Git, via
+[project page](https://hg.sr.ht/~ged/hglib). Or if you prefer Git, via
 [its Github mirror](https://github.com/ged/ruby-hglib).
 
 After checking out the source, run:
 
-    $ rake newb
+    $ gem install -Ng
 
-This task will install any missing dependencies, run the tests/specs,
-and generate the API documentation.
+This will install any missing dependencies.
+
+
+## Authors
+
+- Michael Granger <ged@FaerieMUD.org>
 
 
 ## License
 
-Copyright (c) 2018, Michael Granger
+Copyright (c) 2018-2019, Michael Granger
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
