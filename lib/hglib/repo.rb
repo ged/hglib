@@ -237,6 +237,15 @@ class Hglib::Repo
 	end
 
 
+	### Sign the given +rev+ (or the current one if not specified).
+	def sign( rev=nil, **options )
+		response = self.server.run( :sign, rev, **options )
+		self.logger.debug "Got a SIGN response: %p" % [ response ]
+
+		return response.chomp
+	end
+
+
 	### Fetch a Hash of version information about the Mercurial that is being used.
 	def versions
 		response = self.server.run_with_json_template( :version )

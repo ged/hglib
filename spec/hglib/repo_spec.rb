@@ -222,6 +222,18 @@ RSpec.describe Hglib::Repo do
 	end
 
 
+	it "can sign revisions" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run ).
+			with( :sign, nil, {} ).
+			and_return( "signing 47:66d4e21b7018\n" )
+
+		result = repo.sign
+
+		expect( result ).to eq( "signing 47:66d4e21b7018" )
+	end
+
 	describe "version info" do
 
 		let( :version_info ) {[{
