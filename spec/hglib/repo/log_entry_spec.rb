@@ -1,4 +1,4 @@
-#!/usr/bin/env rspec -cfd
+#!/usr/bin/env ruby -S rspec -cfd
 # frozen_string_literal: true
 
 require_relative '../../spec_helper'

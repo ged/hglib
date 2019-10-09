@@ -1,4 +1,4 @@
-#!/usr/bin/env rspec -cfd
+#!/usr/bin/env ruby -S rspec -cfd
 
 require_relative '../spec_helper'
 
@@ -34,7 +34,7 @@ RSpec.describe "cloning" do
 		expect( repo ).to be_a( Hglib::Repo )
 		expect( repo.path ).to eq( repo_dir )
 		expect( repo.status ).to be_empty
-		expect( repo.id ).to eq( '000000000000' )
+		expect( repo.identify.short_id ).to eq( '000000000000' )
 		expect( repo_dir.children(false) ).to contain_exactly( Pathname('.hg') )
 	end
 
@@ -45,7 +45,7 @@ RSpec.describe "cloning" do
 		expect( repo ).to be_a( Hglib::Repo )
 		expect( repo.path ).to eq( repo_dir )
 		expect( repo.status ).to be_empty
-		expect( repo.id ).to eq( 'da8322c8b033' )
+		expect( repo.identify.short_id ).to eq( 'da8322c8b033' )
 	end
 
 end

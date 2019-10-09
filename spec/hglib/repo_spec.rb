@@ -1,4 +1,4 @@
-#!/usr/bin/env rspec -cfd
+#!/usr/bin/env ruby -S rspec -cfd
 
 require_relative '../spec_helper'
 
@@ -89,6 +89,46 @@ RSpec.describe Hglib::Repo do
 		expect( result ).to be_a( Hglib::Repo::Id ).and( eq '720c115412188539039b87baf57931fb5415a0bf' )
 		expect( result.tags ).to eq( %w[tip] )
 		expect( result.bookmarks ).to eq( %w[v1.1 live master] )
+	end
+
+
+	it "knows if there are uncommitted changes" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run_with_json_template ).
+			with( :identify, nil, {} ).
+			and_return( [{
+				bookmarks: ["v1.1", "live", "master"],
+				branch: "default",
+				dirty: "+",
+				id: "720c115412188539039b87baf57931fb5415a0bf+",
+				node: "ffffffffffffffffffffffffffffffffffffffff",
+				parents: ["720c115412188539039b87baf57931fb5415a0bf"],
+				tags: ["tip"]
+			}] ).twice
+
+		expect( repo ).to be_dirty
+		expect( repo ).to_not be_clean
+	end
+
+
+	it "knows if there aren't any uncommitted changes" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run_with_json_template ).
+			with( :identify, nil, {} ).
+			and_return( [{
+				bookmarks: ["v1.1", "live", "master"],
+				branch: "default",
+				dirty: false,
+				id: "720c115412188539039b87baf57931fb5415a0bf+",
+				node: "ffffffffffffffffffffffffffffffffffffffff",
+				parents: ["720c115412188539039b87baf57931fb5415a0bf"],
+				tags: ["tip"]
+			}] ).twice
+
+		expect( repo ).to_not be_dirty
+		expect( repo ).to be_clean
 	end
 
 
@@ -234,6 +274,7 @@ RSpec.describe Hglib::Repo do
 		expect( result ).to eq( "signing 47:66d4e21b7018" )
 	end
 
+
 	describe "version info" do
 
 		let( :version_info ) {[{
@@ -292,6 +333,141 @@ RSpec.describe Hglib::Repo do
 				topic: {bundled: false, ver: '0.17.0'},
 				hggit: {bundled: false, ver: "0.8.12 (dulwich 0.19.10)"}
 			)
+		end
+
+	end
+
+
+	describe "phases" do
+
+		it "can test the phase of the current revision" do
+			repo = described_class.new( repo_dir )
+
+			expect( server ).to receive( :run ).
+				with( :phase, nil, {} ).
+				and_return( "18: draft\n" )
+
+			result = repo.phase
+
+			expect( result ).to eq( {18 => :draft} )
+		end
+
+
+		it "can test the phase of an arbitrary revision" do
+			repo = described_class.new( repo_dir )
+
+			expect( server ).to receive( :run ).
+				with( :phase, '41c796d06fa398573ecec464238b827bfe75c7cd', {} ).
+				and_return( "12: draft\n" )
+
+			result = repo.phase( '41c796d06fa398573ecec464238b827bfe75c7cd' )
+
+			expect( result ).to eq( {12 => :draft} )
+		end
+
+
+		it "can test the phase of an arbitrary revision with the rev option" do
+			repo = described_class.new( repo_dir )
+
+			expect( server ).to receive( :run ).
+				with( :phase, nil, rev: '41c796d06fa398573ecec464238b827bfe75c7cd' ).
+				and_return( "12: draft\n" )
+
+			result = repo.phase( rev: '41c796d06fa398573ecec464238b827bfe75c7cd' )
+
+			expect( result ).to eq( {12 => :draft} )
+		end
+
+
+		it "can test the phase of an arbitrary revset" do
+			repo = described_class.new( repo_dir )
+
+			expect( server ).to receive( :run ).
+				with( :phase, '13:10', {} ).
+				and_return( "13: secret\n12: draft\n11: public\n10: public\n" )
+
+			result = repo.phase( '13:10' )
+
+			expect( result ).to eq( {13 => :secret, 12 => :draft, 11 => :public, 10 => :public} )
+		end
+
+
+		it "can change the phase of the current revision to `public`" do
+			repo = described_class.new( repo_dir )
+
+			expect( server ).to receive( :run ).
+				with( :phase, nil, public: true ).
+				and_return( '' )
+
+			result = repo.phase( public: true )
+
+			expect( result ).to eq( {} )
+		end
+
+
+		it "can change the phase of the current revision to `draft`" do
+			repo = described_class.new( repo_dir )
+
+			expect( server ).to receive( :run ).
+				with( :phase, nil, draft: true ).
+				and_return( '' )
+
+			result = repo.phase( draft: true )
+
+			expect( result ).to eq( {} )
+		end
+
+
+		it "can change the phase of the current revision to `secret`" do
+			repo = described_class.new( repo_dir )
+
+			expect( server ).to receive( :run ).
+				with( :phase, nil, secret: true ).
+				and_return( '' )
+
+			result = repo.phase( secret: true )
+
+			expect( result ).to eq( {} )
+		end
+
+
+		it "can change the phase of the current revision by force" do
+			repo = described_class.new( repo_dir )
+
+			expect( server ).to receive( :run ).
+				with( :phase, nil, draft: true, force: true ).
+				and_return( '' )
+
+			result = repo.phase( draft: true, force: true )
+
+			expect( result ).to eq( {} )
+		end
+
+
+		it "can change the phase of an arbitrary revision" do
+			repo = described_class.new( repo_dir )
+
+			expect( server ).to receive( :run ).
+				with( :phase, '41c796d06fa398573ecec464238b827bfe75c7cd', public: true ).
+				and_return( '' )
+
+			result = repo.phase( '41c796d06fa398573ecec464238b827bfe75c7cd', public: true )
+
+			expect( result ).to eq( {} )
+		end
+
+
+		it "can test the phase of the current revision" do
+			repo = described_class.new( repo_dir )
+
+			expect( server ).to receive( :run ).
+				with( :phase, nil, {} ).
+				and_return( "18: draft\n" ).
+				at_least( :once )
+
+			expect( repo ).to_not be_public
+			expect( repo ).to be_draft
+			expect( repo ).to_not be_secret
 		end
 
 	end

@@ -65,7 +65,8 @@ class Hglib::Repo
 		data = response.first
 		return Hglib::Repo::Id.new( **data )
 	end
-	alias_method :id, :identify
+	alias_method :identity, :identify
+	alias_method :id, :identity
 
 
 	### Return an Array of Hglib::Repo::LogEntry objects that describes the revision
@@ -267,6 +268,71 @@ class Hglib::Repo
 		return ext_info.each_with_object({}) do |ext, hash|
 			hash[ ext.delete(:name).to_sym ] = ext
 		end
+	end
+
+
+	### Set or show the current phase name for a +revset+.
+	###
+	### With no +revset+, operates on the current changeset.
+	###
+	### You can set the phase of the specified revisions by passing one of the
+	### following +options+:
+	###
+	### - p: true / public: true
+	### - d: true / draft: true
+	### - s: true / secret: true
+	###
+	### Returns a Hash of <local revision number> => <phase as a Symbol>. Setting
+	### the phase returns an empty Hash on success, and raises if there was a problem
+	### setting the phase.
+	def phase( revset=nil, **options )
+		response = self.server.run( :phase, revset, **options )
+		self.logger.debug "Got a PHASE response: %p" % [ response ]
+
+		return {} if response.empty?
+
+		return response.lines.each_with_object({}) do |line, hash|
+			m = line.match( /^(?<revnum>\d+): (?<phase>\w+)/ ) or
+				raise "Couldn't parse phase response %p" % [ line ]
+			hash[ m[:revnum].to_i ] = m[:phase].to_sym
+		end
+	end
+
+
+	#
+	# Shortcut predicates
+	#
+
+	### Returns +true+ if the repo has outstanding changes.
+	def dirty?
+		return self.identify.dirty?
+	end
+
+
+	### Returns +true+ if the repo has no outstanding changes.
+	def clean?
+		return !self.dirty?
+	end
+
+
+	### Returns +true+ if all of the changesets in the specified +revset+ (or the
+	### current changeset if no +revset+ is given) are in the public phase.
+	def public?( revset=nil )
+		return self.phase( revset ).values.all?( :public )
+	end
+
+
+	### Returns +true+ if all of the changesets in the specified +revset+ (or the
+	### current changeset if no +revset+ is given) are in the draft phase.
+	def draft?( revset=nil )
+		return self.phase( revset ).values.all?( :draft )
+	end
+
+
+	### Returns +true+ if all of the changesets in the specified +revset+ (or the
+	### current changeset if no +revset+ is given) are in the secret phase.
+	def secret?( revset=nil )
+		return self.phase( revset ).values.all?( :secret )
 	end
 
 

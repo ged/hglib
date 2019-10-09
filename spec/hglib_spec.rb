@@ -1,4 +1,4 @@
-#!/usr/bin/env rspec -cfd
+#!/usr/bin/env ruby -S rspec -cfd
 
 require_relative 'spec_helper'
 
@@ -106,7 +106,7 @@ RSpec.describe Hglib do
 
 			expect( exception ).to be_multiple
 			expect( exception.message ).to eq( <<~ERROR_MESSAGE )
-				`status`: 
+				`status`:
 				  - no_status: No such file or directory
 				  - unknown: No such file or directory
 			ERROR_MESSAGE

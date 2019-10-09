@@ -1,4 +1,4 @@
-#!/usr/bin/env rspec -cfd
+#!/usr/bin/env ruby -S rspec -cfd
 
 require_relative '../spec_helper'
 

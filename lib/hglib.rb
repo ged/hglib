@@ -58,7 +58,7 @@ module Hglib
 		def message
 			msg = String.new( encoding: 'utf-8' )
 
-			msg << "`%s`: " % [ self.command ]
+			msg << "`%s`:" % [ self.command ]
 
 			if self.multiple?
 				self.messages.each do |errmsg|
@@ -66,7 +66,7 @@ module Hglib
 				end
 				msg << "\n"
 			else
-				msg << self.messages.first
+				msg << ' ' << self.messages.first
 			end
 
 			return msg

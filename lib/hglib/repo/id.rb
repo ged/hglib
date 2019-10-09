@@ -49,7 +49,7 @@ class Hglib::Repo::Id
 	attr_reader :branch
 
 	##
-	# The ID of the current
+	# The ID of the current changeset node
 	attr_reader :node
 
 	##
@@ -71,6 +71,12 @@ class Hglib::Repo::Id
 	attr_reader :bookmarks
 
 
+	### Return the short form of the global ID.
+	def short_id
+		return self.id[ 0, 12 ]
+	end
+
+
 	### Return the ID as a String in the form used by the command line.
 	def to_s
 		str = self.global.dup
@@ -89,6 +95,12 @@ class Hglib::Repo::Id
 	def ==( other )
 		return (other.is_a?( self.class ) && self.to_s == other.to_s) ||
 			self.global == other
+	end
+
+
+	### Returns +true+ if the Id's revision ID is the DEFAULT_ID
+	def default?
+		return self.id == DEFAULT_ID
 	end
 
 end # class Hglib::Repo::Id

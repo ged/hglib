@@ -4,3 +4,4 @@ ChangeLog
 spec/.status
 \.gem$
 docs/
+^commit\-msg\.txt$
