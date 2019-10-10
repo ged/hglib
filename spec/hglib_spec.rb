@@ -120,19 +120,19 @@ RSpec.describe Hglib do
 
 		let( :version_info ) {[{
 			extensions: [
-				{bundled: true, name: "churn", ver: nil},
-				{bundled: true, name: "convert", ver: nil},
-				{bundled: false, name: "evolve", ver: "9.2.0"},
-				{bundled: true, name: "extdiff", ver: nil},
-				{bundled: true, name: "gpg", ver: nil},
-				{bundled: false, name: "hggit", ver: "0.8.12 (dulwich 0.19.10)"},
-				{bundled: true, name: "strip", ver: nil},
-				{bundled: true, name: "mq", ver: nil},
-				{bundled: false, name: "prompt", ver: nil},
-				{bundled: true, name: "purge", ver: nil},
-				{bundled: true, name: "rebase", ver: nil},
-				{bundled: false, name: "topic", ver: "0.17.0"},
-				{bundled: true, name: "histedit", ver: nil}
+				{bundled: true,  name: "churn",    ver: nil},
+				{bundled: true,  name: "convert",  ver: nil},
+				{bundled: false, name: "evolve",   ver: "9.2.0"},
+				{bundled: true,  name: "extdiff",  ver: nil},
+				{bundled: true,  name: "gpg",      ver: nil},
+				{bundled: false, name: "hggit",    ver: "0.8.12 (dulwich 0.19.10)"},
+				{bundled: true,  name: "strip",    ver: nil},
+				{bundled: true,  name: "mq",       ver: nil},
+				{bundled: false, name: "prompt",   ver: nil},
+				{bundled: true,  name: "purge",    ver: nil},
+				{bundled: true,  name: "rebase",   ver: nil},
+				{bundled: false, name: "topic",    ver: "0.17.0"},
+				{bundled: true,  name: "histedit", ver: nil}
 			],
 			ver: "5.1.1"
 		}]}
@@ -177,6 +177,12 @@ RSpec.describe Hglib do
 				topic: {bundled: false, ver: '0.17.0'},
 				hggit: {bundled: false, ver: "0.8.12 (dulwich 0.19.10)"}
 			)
+		end
+
+
+		it "knows if a given extension is enabled" do
+			expect( described_class.extension_enabled?('topic') ).to be_truthy
+			expect( described_class.extension_enabled?('keyword') ).to be_falsey
 		end
 
 	end
