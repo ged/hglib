@@ -37,21 +37,30 @@ class Hglib::Server
 			prefix = name.length > 1 ? '--' : '-'
 			optname = "%s%s" % [ prefix, name.to_s.gsub(/_/, '-') ]
 
-			case val
-			when TrueClass
-				[ optname ]
-			when FalseClass, NilClass
-				[ optname.sub(/\A--/, '--no-') ] if optname.start_with?( '--' )
-			when String, Numeric
-				if optname.start_with?( '--' )
-					[ "#{optname}=#{val}" ]
-				else
-					[ optname, val ]
-				end
-			else
-				raise ArgumentError, "can't handle command option: %p" % [{ name => val }]
-			end
+			self.make_command_option( optname, val )
 		end.compact
+	end
+
+
+	### Form one or more command line options given an +optname+ and +value+ and
+	### return them as an Array.
+	def self::make_command_option( optname, value )
+		case value
+		when TrueClass
+			return [ optname ]
+		when FalseClass, NilClass
+			return [ optname.sub(/\A--/, '--no-') ] if optname.start_with?( '--' )
+		when String, Numeric
+			if optname.start_with?( '--' )
+				return [ "#{optname}=#{value}" ]
+			else
+				return [ optname, value ]
+			end
+		when Array
+			return value.map {|v| self.make_command_option(optname, v) }
+		else
+			raise ArgumentError, "can't handle command option: %p" % [{ name => value }]
+		end
 	end
 
 

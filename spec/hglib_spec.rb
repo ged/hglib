@@ -40,10 +40,10 @@ RSpec.describe Hglib do
 
 	describe "server" do
 
-		it "can create a server object" do
+		it "can create a server object with no repository" do
 			expect( described_class.server ).to be_a( Hglib::Server )
 			expect( described_class.server ).to equal( described_class.server )
-			expect( described_class.server.repo ).to eq( Pathname('.') )
+			expect( described_class.server.repo ).to be_nil
 		end
 
 	end
@@ -110,6 +110,73 @@ RSpec.describe Hglib do
 				  - no_status: No such file or directory
 				  - unknown: No such file or directory
 			ERROR_MESSAGE
+		end
+
+	end
+
+
+
+	describe "version info" do
+
+		let( :version_info ) {[{
+			extensions: [
+				{bundled: true, name: "churn", ver: nil},
+				{bundled: true, name: "convert", ver: nil},
+				{bundled: false, name: "evolve", ver: "9.2.0"},
+				{bundled: true, name: "extdiff", ver: nil},
+				{bundled: true, name: "gpg", ver: nil},
+				{bundled: false, name: "hggit", ver: "0.8.12 (dulwich 0.19.10)"},
+				{bundled: true, name: "strip", ver: nil},
+				{bundled: true, name: "mq", ver: nil},
+				{bundled: false, name: "prompt", ver: nil},
+				{bundled: true, name: "purge", ver: nil},
+				{bundled: true, name: "rebase", ver: nil},
+				{bundled: false, name: "topic", ver: "0.17.0"},
+				{bundled: true, name: "histedit", ver: nil}
+			],
+			ver: "5.1.1"
+		}]}
+
+		let( :server ) { instance_double(Hglib::Server, stop: nil) }
+
+
+		before( :each ) do
+			described_class.reset_server
+			allow( Hglib::Server ).to receive( :new ).and_return( server )
+			expect( server ).to receive( :run_with_json_template ).
+				with( :version ).
+				and_return( version_info ).
+				at_least( :once )
+		end
+		after( :each ) do
+			described_class.reset_server
+		end
+
+
+		it "can fetch the versions of Mercurial and loaded extensions" do
+			result = described_class.versions
+
+			expect( result ).to eq( version_info.first )
+		end
+
+
+		it "can fetch the simple version of Mercurial" do
+			result = described_class.version
+
+			expect( result ).to eq( version_info.first[:ver] )
+		end
+
+
+		it "can fetch the versions of all loaded Mercurial extensions" do
+			result = described_class.extension_versions
+
+			expect( result ).to be_a( Hash )
+			expect( result ).to include(
+				churn: {bundled: true, ver: nil},
+				evolve: {bundled: false, ver: '9.2.0'},
+				topic: {bundled: false, ver: '0.17.0'},
+				hggit: {bundled: false, ver: "0.8.12 (dulwich 0.19.10)"}
+			)
 		end
 
 	end

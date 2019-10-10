@@ -97,11 +97,18 @@ module Hglib
 	autoload :Repo, 'hglib/repo'
 
 
-	### Return an Hglib::Server set to use the current ::hg_path, creating one if
-	### necessary.
-	def self::server( repo='.' )
-		@hg_servers ||= {}
-		return @hg_servers[ repo ] ||= Hglib::Server.new( repo )
+	### Return an Hglib::Server started with no repository.
+	def self::server
+		return @hg_server ||= Hglib::Server.new( nil )
+	end
+
+
+	### Shut down and remove the ::server if one exists. Mostly used for testing.
+	def self::reset_server
+		if ( server = @hg_server )
+			@hg_server = nil
+			server.stop
+		end
 	end
 
 
@@ -124,7 +131,7 @@ module Hglib
 	### directory with the basename of the +source_repo+ in the current working
 	### directory.
 	def self::clone( source_repo, local_dir=nil, **options )
-		output = self.server( nil ).run( :clone, source_repo, local_dir, **options )
+		output = self.server.run( :clone, source_repo, local_dir, **options )
 		self.log.debug "Clone output: %s" % [ output ]
 
 		local_dir ||= Pathname.pwd + File.basename( source_repo )
@@ -135,10 +142,34 @@ module Hglib
 	### Initialize a repository in the given +dir+ and return a Hglib::Repo
 	### for it.
 	def self::init( dir, **options )
-		output = self.server( nil ).run( :init, dir, **options )
+		output = self.server.run( :init, dir, **options )
 		self.log.debug "Init output: %s" % [ output ]
 
 		return self.repo( dir )
+	end
+
+
+	### Fetch a Hash of version information about the Mercurial that is being used.
+	def self::versions
+		response = self.server.run_with_json_template( :version )
+		self.logger.debug "Got a VERSION response: %p" % [ response ]
+
+		return response.first
+	end
+
+
+	### Fetch the version of Mercurial that's being used as a String.
+	def self::version
+		return self.versions[ :ver ]
+	end
+
+
+	### Fetch the version of the Mercurial extensions that're being used as a Hash.
+	def self::extension_versions
+		ext_info = self.versions[ :extensions ]
+		return ext_info.each_with_object({}) do |ext, hash|
+			hash[ ext.delete(:name).to_sym ] = ext
+		end
 	end
 
 end # module Hglib
