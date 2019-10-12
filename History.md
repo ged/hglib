@@ -2,6 +2,17 @@
 
 ---
 
+## v0.4.0 [2019-10-12] Michael Granger <ged@FaerieMUD.org>
+
+Changes:
+
+- Move the #version methods up into the base module
+
+Improvements:
+
+- Add Hglib.extension_enabled?
+
+
 ## v0.3.0 [2019-10-02] Michael Granger <ged@FaerieMUD.org>
 
 Changes:
