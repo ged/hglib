@@ -1,8 +1,9 @@
-coverage/
-pkg/
-empty_repo/
 ChangeLog
+coverage/
+docs/
+empty_repo/
+pkg/
 spec/.status
 \.gem$
-docs/
+\.lock$
 ^commit\-msg\.txt$
