@@ -86,9 +86,10 @@ RSpec.describe Hglib do
 
 
 		it "can be created with a single error message" do
-			exception = rescued {
-				raise Hglib::CommandError, [:status, "no_status: No such file or directory\n"]
-			}
+			exception = rescued do
+				exc = Hglib::CommandError.new( :status, "no_status: No such file or directory\n" )
+				raise( exc, nil, caller(2) )
+			end
 
 			expect( exception ).to_not be_multiple
 			expect( exception.message ).to eq( "`status`: no_status: No such file or directory" )
@@ -96,13 +97,14 @@ RSpec.describe Hglib do
 
 
 		it "can be created with multiple error messages" do
-			exception = rescued {
-				raise Hglib::CommandError, [
+			exception = rescued do
+				exc = Hglib::CommandError.new(
 					:status,
 					"no_status: No such file or directory\n",
 					"unknown: No such file or directory\n"
-				]
-			}
+				)
+				raise( exc, nil, caller(2) )
+			end
 
 			expect( exception ).to be_multiple
 			expect( exception.message ).to eq( <<~ERROR_MESSAGE )
@@ -110,6 +112,22 @@ RSpec.describe Hglib do
 				  - no_status: No such file or directory
 				  - unknown: No such file or directory
 			ERROR_MESSAGE
+		end
+
+
+		it "can be created with additional details" do
+			exception = rescued do
+				exc = Hglib::CommandError.new(
+					:sigs,
+					"hg sigs: option -T not recognized\n",
+					details: "hg sigs\n\nlist signed changesets\n\noptions:\n\n" +
+						"  --mq operate on patch repository\n\n(use 'hg sigs -h'" +
+						" to show more help)\n"
+				)
+				raise( exc, nil, caller(2) )
+			end
+
+			expect( exception.details ).to match( /list signed changesets/i )
 		end
 
 	end

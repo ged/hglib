@@ -2,13 +2,10 @@
 
 $LOAD_PATH.unshift( File.expand_path 'lib' )
 
-begin
-	require 'hglib'
-	require 'loggability'
-rescue Exception => e
-	$stderr.puts "Ack! Libraries failed to load: #{e.message}\n\t" +
-		e.backtrace.join( "\n\t" )
-end
-
+require 'loggability'
 
 Loggability.level = :debug
+Loggability.format_with( :color )
+
+require 'hglib'
+

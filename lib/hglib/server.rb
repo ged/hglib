@@ -26,6 +26,14 @@ class Hglib::Server
 	# Array#pack template for plain messages sent to the command server
 	MESSAGE_TEMPLATE = 'I>A*'
 
+	# A Regexp to match the detail message when a command belongs to a disabled
+	# extension.
+	EXTENSION_DISABLED_DETAILS = %r{
+		(?-x:is provided by the following extension:)
+		\s+
+		(?<extension_name>\w+)
+	}x
+
 
 	# Loggability API -- send logs to the logger in the top-level module
 	log_to :hglib
@@ -184,10 +192,25 @@ class Hglib::Server
 			end
 		end
 
-		raise Hglib::CommandError, [command, *errors] unless errors.empty?
+		self.handle_errors( command, errors, output ) unless errors.empty?
 
 		self.log.debug { "Got %s response: %p" % [ command.to_s.upcase, output ] }
 		return output
+	end
+
+
+	### Form and raise an exception for the given +errors+ resulting from running
+	### +command+.
+	def handle_errors( command, errors, details )
+		err = nil
+
+		if details && (m = details.match(EXTENSION_DISABLED_DETAILS) )
+			err = Hglib::DisabledExtensionError.new( command, m[:extension_name] )
+		else
+			err = Hglib::CommandError.new( command, errors, details: details )
+		end
+
+		raise( err, nil, caller(2) )
 	end
 
 

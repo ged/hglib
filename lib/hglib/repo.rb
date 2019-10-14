@@ -215,13 +215,6 @@ class Hglib::Repo
 	end
 
 
-	### Sign the given +rev+ (or the current one if not specified).
-	def sign( rev=nil, **options )
-		response = self.server.run( :sign, rev, **options )
-		return response.chomp
-	end
-
-
 	### Set or show the current phase name for a +revset+.
 	###
 	### With no +revset+, operates on the current changeset.
