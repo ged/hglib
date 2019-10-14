@@ -5,6 +5,8 @@ require 'rake/deveiate'
 # Dogfood
 $LOAD_PATH.unshift( 'lib', '../rake-deveiate/lib' )
 
-Rake::DevEiate.setup( 'hglib' )
+Rake::DevEiate.setup( 'hglib' ) do |project|
+	project.publish_to = 'deveiate:/usr/local/www/public/code'
+end
 
 
