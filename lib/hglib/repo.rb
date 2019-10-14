@@ -3,11 +3,14 @@
 
 require 'json'
 require 'loggability'
+
 require 'hglib' unless defined?( Hglib )
+require 'hglib/version_info'
 
 
 class Hglib::Repo
 	extend Loggability
+	include Hglib::VersionInfo
 
 	# Loggability API -- log to the hglib logger
 	log_to :hglib
@@ -48,7 +51,6 @@ class Hglib::Repo
 	### requested statuses.
 	def status( *args, **options )
 		response = self.server.run_with_json_template( :status, *args, **options )
-		self.logger.debug "Parsing status response: %p" % [ response ]
 
 		return response.map {|entry| Hglib::Repo::StatusEntry.new(entry) }
 	end
@@ -60,7 +62,6 @@ class Hglib::Repo
 	### of `.` identifies the working directory parent without uncommitted changes.
 	def identify( source=nil, **options )
 		response = self.server.run_with_json_template( :identify, source, **options )
-		self.logger.debug "Got ID response: %p" % [ response ]
 
 		data = response.first
 		return Hglib::Repo::Id.new( **data )
@@ -75,7 +76,6 @@ class Hglib::Repo
 		options[:graph] = false
 
 		entries = self.server.run_with_json_template( :log, *files, **options )
-		self.logger.debug "Got log response: %p" % [ entries ]
 
 		return entries.map {|entry| Hglib::Repo::LogEntry.new(entry) }
 	end
@@ -84,9 +84,7 @@ class Hglib::Repo
 	### Return a String showing differences between revisions for the specified
 	### +files+ in the unified diff format.
 	def diff( *files, **options )
-		response = self.server.run( :diff, *files, **options )
-		self.logger.debug "Got diff response: %p" % [ truncate(response) ]
-		return response
+		return self.server.run( :diff, *files, **options )
 	end
 
 
@@ -98,9 +96,7 @@ class Hglib::Repo
 	###
 	### Returns <code>true</code> if all files are successfully added.
 	def add( *files, **options )
-		response = self.server.run( :add, *files, **options )
-		self.logger.debug "Got ADD response: %p" % [ response ]
-
+		self.server.run( :add, *files, **options )
 		return true
 	end
 
@@ -122,9 +118,7 @@ class Hglib::Repo
 	###
 	### Returns <code>true</code> if all files are successfully added.
 	def addremove( *files, **options )
-		response = self.server.run( :addremove, *files, **options )
-		self.logger.debug "Got ADD response: %p" % [ response ]
-
+		self.server.run( :addremove, *files, **options )
 		return true
 	end
 	alias_method :add_remove, :addremove
@@ -133,9 +127,7 @@ class Hglib::Repo
 
 	### Commit the specified +files+ with the given +options+.
 	def commit( *files, **options )
-		response = self.server.run( :commit, *files, **options )
-		self.logger.debug "Got COMMIT response: %p" % [ response ]
-
+		self.server.run( :commit, *files, **options )
 		return true
 	end
 
@@ -143,9 +135,7 @@ class Hglib::Repo
 	### Pull changes from the specified +source+ (which defaults to the +default+
 	### path) into the local repository.
 	def pull( source=nil, **options )
-		response = self.server.run( :pull, source, **options )
-		self.logger.debug "Got PULL response: %p" % [ response ]
-
+		self.server.run( :pull, source, **options )
 		return true
 	end
 
@@ -160,18 +150,14 @@ class Hglib::Repo
 
 	### Update the working directory or switch revisions.
 	def update( rev=nil, **options )
-		response = self.server.run( :update, rev, **options )
-		self.logger.debug "Got UPDATE response: %p" % [ response ]
-
+		self.server.run( :update, rev, **options )
 		return true
 	end
 
 
 	### Push changes to the specified +destination+.
 	def push( destination=nil, **options )
-		response = self.server.run( :push, destination, **options )
-		self.logger.debug "Got PUSH response: %p" % [ response ]
-
+		self.server.run( :push, destination, **options )
 		return true
 	end
 
@@ -190,8 +176,6 @@ class Hglib::Repo
 	### Return a Hglib::Repo::Tag object for each tag in the repo.
 	def tags
 		response = self.server.run_with_json_template( :tags )
-		self.logger.debug "Got a TAGS response: %p" % [ response ]
-
 		return response.flatten.map {|tag| Hglib::Repo::Tag.new(self, **tag) }
 	end
 
@@ -200,9 +184,7 @@ class Hglib::Repo
 	def bookmark( *names, **options )
 		raise "expected at least one bookmark name" if names.empty?
 
-		response = self.server.run( :bookmark, *names, **options )
-		self.logger.debug "Got BOOKMARK response: %p" % [ response ]
-
+		self.server.run( :bookmark, *names, **options )
 		return true
 	end
 
@@ -211,8 +193,6 @@ class Hglib::Repo
 	def bookmarks
 		options = { list: true }
 		response = self.server.run_with_json_template( :bookmarks, **options )
-		self.logger.debug "Got a BOOKMARKS response: %p" % [ response ]
-
 		return response.map {|bk| Hglib::Repo::Bookmark.new(self, **bk) }
 	end
 
@@ -221,7 +201,6 @@ class Hglib::Repo
 	### object.
 	def config( untrusted: false )
 		options = { untrusted: untrusted }
-
 		config = self.server.run_with_json_template( :showconfig, **options )
 		return Hglib::Config.new( config )
 	end
@@ -230,8 +209,6 @@ class Hglib::Repo
 	### Fetch a Hash of aliases for remote repositories.
 	def paths
 		response = self.server.run_with_json_template( :paths )
-		self.logger.debug "Got a PATHS response: %p" % [ response ]
-
 		return response.each_with_object({}) do |entry, hash|
 			hash[ entry[:name].to_sym ] = URI( entry[:url] )
 		end
@@ -241,8 +218,6 @@ class Hglib::Repo
 	### Sign the given +rev+ (or the current one if not specified).
 	def sign( rev=nil, **options )
 		response = self.server.run( :sign, rev, **options )
-		self.logger.debug "Got a SIGN response: %p" % [ response ]
-
 		return response.chomp
 	end
 
@@ -263,7 +238,6 @@ class Hglib::Repo
 	### setting the phase.
 	def phase( revset=nil, **options )
 		response = self.server.run( :phase, revset, **options )
-		self.logger.debug "Got a PHASE response: %p" % [ response ]
 
 		return {} if response.empty?
 

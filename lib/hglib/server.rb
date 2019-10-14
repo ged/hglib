@@ -147,7 +147,7 @@ class Hglib::Server
 	### callbacks is not registered, an IOError will be raised.
 	def run( command, *args, **options )
 		args = args.compact
-		self.log.debug "Running command: %p" % [ Shellwords.join([command.to_s] + args) ]
+		self.log.debug { "Running command: %p" % [ Shellwords.join([command.to_s] + args) ] }
 		self.start unless self.started?
 
 		done = false
@@ -186,6 +186,7 @@ class Hglib::Server
 
 		raise Hglib::CommandError, [command, *errors] unless errors.empty?
 
+		self.log.debug { "Got %s response: %p" % [ command.to_s.upcase, output ] }
 		return output
 	end
 
@@ -318,7 +319,7 @@ class Hglib::Server
 
 		self.log.debug "Reading %d more bytes of the message" % [ bytes ]
 		message = self.reader.read( bytes ) unless bytes.zero?
-		self.log.debug "  read message: %p" % [ message ]
+		self.log.debug { "  read message: %p" % [ message ] }
 		return channel, message
 	end
 

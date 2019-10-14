@@ -95,6 +95,8 @@ module Hglib
 	autoload :Config, 'hglib/config'
 	autoload :Server, 'hglib/server'
 	autoload :Repo, 'hglib/repo'
+	autoload :Extensions, 'hglib/extensions'
+	autoload :VersionInfo, 'hglib/version_info'
 
 
 	### Return an Hglib::Server started with no repository.
@@ -149,36 +151,7 @@ module Hglib
 	end
 
 
-	### Fetch a Hash of version information about the Mercurial that is being used.
-	def self::versions
-		response = self.server.run_with_json_template( :version )
-		self.logger.debug "Got a VERSION response: %p" % [ response ]
-
-		return response.first
-	end
-
-
-	### Fetch the version of Mercurial that's being used as a String.
-	def self::version
-		return self.versions[ :ver ]
-	end
-
-
-	### Fetch the version of the Mercurial extensions that're being used as a Hash.
-	def self::extension_versions
-		ext_info = self.versions[ :extensions ]
-		return ext_info.each_with_object({}) do |ext, hash|
-			ext = ext.dup
-			hash[ ext.delete(:name).to_sym ] = ext
-		end
-	end
-
-
-	### Returns +true+ if the extension with the given +name+ is enabled in the
-	### current (global) configuration.
-	def self::extension_enabled?( name )
-		return self.extension_versions.key?( name.to_sym )
-	end
+	extend Hglib::VersionInfo
 
 end # module Hglib
 

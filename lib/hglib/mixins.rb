@@ -57,7 +57,10 @@ module Hglib
 		def attr_predicate( attrname )
 			attrname = attrname.to_s.chomp( '?' )
 			define_method( "#{attrname}?" ) do
-				instance_variable_get( "@#{attrname}" ) ? true : false
+				ivar = "@#{attrname}"
+				instance_variable_defined?( ivar ) && instance_variable_get( ivar ) ?
+					true :
+					false
 			end
 		end
 
