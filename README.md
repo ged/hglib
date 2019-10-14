@@ -47,7 +47,8 @@ After checking out the source, run:
 
     $ gem install -Ng
 
-This will install any missing dependencies.
+This will install any missing dependencies, after which you can get a list of
+the available development tasks with `rake -T`.
 
 
 ## Authors
