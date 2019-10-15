@@ -2,6 +2,16 @@
 
 ---
 
+## v0.5.0 [2019-10-14] Michael Granger <ged@FaerieMUD.org>
+
+Improvements:
+
+- Add a mechanism for defining methods that support Mercurial extensions
+- Move the version methods into a mixin and expose them on both Hglib and
+  Hglib::Repo instances.
+- Add an extension for gpg
+
+
 ## v0.4.0 [2019-10-12] Michael Granger <ged@FaerieMUD.org>
 
 Changes:
