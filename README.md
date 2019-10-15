@@ -7,7 +7,7 @@ code
 : https://hg.sr.ht/~ged/hglib
 
 github
-: https://github.com/ged/ruby-hglib
+: https://github.com/ged/hglib
 
 docs
 : http://deveiate.org/code/hglib
@@ -41,7 +41,7 @@ that uses the [Command Server][cmdserver] for efficiency.
 
 You can check out the current development source with Mercurial via its
 [project page](https://hg.sr.ht/~ged/hglib). Or if you prefer Git, via
-[its Github mirror](https://github.com/ged/ruby-hglib).
+[its Github mirror](https://github.com/ged/hglib).
 
 After checking out the source, run:
 
