@@ -76,5 +76,30 @@ module Hglib
 	end # module MethodUtilities
 
 
+	# An extensible #inspect for Hglib objects.
+	module Inspection
+
+		### Return a human-readable representation of the object suitable for debugging.
+		def inspect
+			return "#<%p:%#016x %s>" % [
+				self.class,
+				self.object_id * 2,
+				self.inspect_details,
+			]
+		end
+
+
+		### Return the detail portion of the inspect output for this object.
+		def inspect_details
+			return self.instance_variables.sort.map do |ivar|
+				"%s=%p" % [ ivar, self.instance_variable_get(ivar) ]
+			end.join( ', ' )
+		end
+
+	end # module Inspection
+
+
+
+
 end # module Hglib
 
