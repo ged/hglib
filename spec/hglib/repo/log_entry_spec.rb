@@ -8,6 +8,17 @@ require 'hglib/repo/log_entry'
 
 RSpec.describe Hglib::Repo::LogEntry do
 
+	before( :all ) do
+		# Set the timezone so time comparisons work
+		@real_tz = ENV['TZ']
+		ENV['TZ'] = 'America/Los_Angeles'
+	end
+
+	after( :all ) do
+		ENV['TZ'] = @real_tz
+	end
+
+
 	RAW_LOG_ENTRY = {
 		bookmarks: ['master'],
 		branch: "default",
