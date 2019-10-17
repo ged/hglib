@@ -2,6 +2,13 @@
 
 ---
 
+## v0.6.0 [2019-10-16] Michael Granger <ged@FaerieMUD.org>
+
+Improvements:
+
+- Add topic extension
+
+
 ## v0.5.0 [2019-10-14] Michael Granger <ged@FaerieMUD.org>
 
 Improvements:
