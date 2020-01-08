@@ -1,15 +1,14 @@
 # -*- ruby -*-
 # frozen_string_literal: true
 
-require 'e2mmap'
 require 'loggability'
 require 'pathname'
 
 
 # Toplevel namespace
 module Hglib
-	extend Loggability,
-	       Exception2MessageMapper
+	extend Loggability
+
 
 	# Package version
 	VERSION = '0.6.0'
@@ -28,7 +27,8 @@ module Hglib
 
 
 	# Base exception class for errors raised by this library
-	def_exception :Error, "hglib error"
+	class Error < RuntimeError; end
+
 
 	# Specialized exception for handling errors returned by the command server.
 	class CommandError < Hglib::Error
