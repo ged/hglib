@@ -1,6 +1,12 @@
 # Release History for hglib
 
 ---
+## v0.7.0 [2020-01-08] Michael Granger <ged@FaerieMUD.org>
+
+Changes:
+
+- Fix some stuff for Ruby 2.7 compatibility.
+
 
 ## v0.6.0 [2019-10-16] Michael Granger <ged@FaerieMUD.org>
 
