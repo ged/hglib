@@ -35,5 +35,7 @@ RSpec.configure do |config|
 	end
 	config.filter_run_excluding( :requires_binary ) unless Hglib.hg_path.executable?
 
+	ENV['HGUSER'] = 'RSpec Unit Tests <rspec@example.test>'
+
 	config.include( Loggability::SpecHelpers )
 end
