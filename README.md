@@ -18,6 +18,7 @@ docs
 This is a client library for the Mercurial distributed revision control tool
 that uses the [Command Server][cmdserver] for efficiency.
 
+[![builds.sr.ht status](https://builds.sr.ht/~ged/hglib.svg)](https://builds.sr.ht/~ged/hglib?)
 
 ### Examples
 

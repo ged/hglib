@@ -130,7 +130,7 @@ RSpec.describe Hglib::Extension::Topic do
 
 	it "can return the stack of changesets from the current topic" do
 		expect( server ).to receive( :run_with_json_template ).
-			with( :stack, nil, {} ).
+			with( :stack, nil, any_args ).
 			and_return( topic_changesets )
 
 		results = repo.stack

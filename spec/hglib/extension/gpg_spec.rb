@@ -23,7 +23,7 @@ RSpec.describe Hglib::Extension::GPG do
 
 	it "can sign a revision" do
 		expect( server ).to receive( :run ).
-			with( :sign, nil, {} ).
+			with( :sign, nil, any_args ).
 			and_return( "signing 2:2b937981802a\n" )
 
 		expect( repo.sign ).to eq( "signing 2:2b937981802a" )

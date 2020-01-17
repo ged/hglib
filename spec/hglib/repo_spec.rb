@@ -23,7 +23,7 @@ RSpec.describe Hglib::Repo do
 		repo = described_class.new( repo_dir )
 
 		expect( server ).to receive( :run_with_json_template ).
-			with( :status, {} ).
+			with( :status, any_args ).
 			and_return( [] )
 
 		result = repo.status
@@ -36,7 +36,7 @@ RSpec.describe Hglib::Repo do
 		repo = described_class.new( repo_dir )
 
 		expect( server ).to receive( :run_with_json_template ).
-			with( :status, {} ).
+			with( :status, any_args ).
 			and_return([
 				{
 					path: "lib/hglib/repo.rb",
@@ -73,7 +73,7 @@ RSpec.describe Hglib::Repo do
 		repo = described_class.new( repo_dir )
 
 		expect( server ).to receive( :run_with_json_template ).
-			with( :identify, nil, {} ).
+			with( :identify, nil, any_args ).
 			and_return( [{
 				bookmarks: ["v1.1", "live", "master"],
 				branch: "default",
@@ -96,7 +96,7 @@ RSpec.describe Hglib::Repo do
 		repo = described_class.new( repo_dir )
 
 		expect( server ).to receive( :run_with_json_template ).
-			with( :identify, nil, {} ).
+			with( :identify, nil, any_args ).
 			and_return( [{
 				bookmarks: ["v1.1", "live", "master"],
 				branch: "default",
@@ -116,7 +116,7 @@ RSpec.describe Hglib::Repo do
 		repo = described_class.new( repo_dir )
 
 		expect( server ).to receive( :run_with_json_template ).
-			with( :identify, nil, {} ).
+			with( :identify, nil, any_args ).
 			and_return( [{
 				bookmarks: ["v1.1", "live", "master"],
 				branch: "default",
@@ -173,7 +173,7 @@ RSpec.describe Hglib::Repo do
 	it "can fetch a diff of the current working copy of the repository" do
 		repo = described_class.new( repo_dir )
 
-		expect( server ).to receive( :run ).with( :diff, {} ).
+		expect( server ).to receive( :run ).with( :diff, any_args ).
 			and_return( "the diff" )
 
 		result = repo.diff
@@ -185,7 +185,7 @@ RSpec.describe Hglib::Repo do
 	it "can fetch a diff of particular files" do
 		repo = described_class.new( repo_dir )
 
-		expect( server ).to receive( :run ).with( :diff, 'README.md', 'Rakefile', {} ).
+		expect( server ).to receive( :run ).with( :diff, 'README.md', 'Rakefile', any_args ).
 			and_return( "two files diff" )
 
 		result = repo.diff( 'README.md', 'Rakefile' )
@@ -197,7 +197,7 @@ RSpec.describe Hglib::Repo do
 	it "can add all new files to the repository" do
 		repo = described_class.new( repo_dir )
 
-		expect( server ).to receive( :run ).with( :add, {} )
+		expect( server ).to receive( :run ).with( :add, any_args )
 
 		result = repo.add
 		expect( result ).to be_truthy
@@ -266,7 +266,7 @@ RSpec.describe Hglib::Repo do
 		repo = described_class.new( repo_dir )
 
 		expect( server ).to receive( :run ).
-			with( :sign, nil, {} ).
+			with( :sign, nil, any_args ).
 			and_return( "signing 47:66d4e21b7018\n" )
 
 		result = repo.sign
@@ -281,7 +281,7 @@ RSpec.describe Hglib::Repo do
 			repo = described_class.new( repo_dir )
 
 			expect( server ).to receive( :run ).
-				with( :phase, nil, {} ).
+				with( :phase, nil, any_args ).
 				and_return( "18: draft\n" )
 
 			result = repo.phase
@@ -294,7 +294,7 @@ RSpec.describe Hglib::Repo do
 			repo = described_class.new( repo_dir )
 
 			expect( server ).to receive( :run ).
-				with( :phase, '41c796d06fa398573ecec464238b827bfe75c7cd', {} ).
+				with( :phase, '41c796d06fa398573ecec464238b827bfe75c7cd', any_args ).
 				and_return( "12: draft\n" )
 
 			result = repo.phase( '41c796d06fa398573ecec464238b827bfe75c7cd' )
@@ -320,7 +320,7 @@ RSpec.describe Hglib::Repo do
 			repo = described_class.new( repo_dir )
 
 			expect( server ).to receive( :run ).
-				with( :phase, '13:10', {} ).
+				with( :phase, '13:10', any_args ).
 				and_return( "13: secret\n12: draft\n11: public\n10: public\n" )
 
 			result = repo.phase( '13:10' )
@@ -398,7 +398,7 @@ RSpec.describe Hglib::Repo do
 			repo = described_class.new( repo_dir )
 
 			expect( server ).to receive( :run ).
-				with( :phase, nil, {} ).
+				with( :phase, nil, any_args ).
 				and_return( "18: draft\n" ).
 				at_least( :once )
 
