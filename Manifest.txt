@@ -5,6 +5,7 @@ lib/hglib.rb
 lib/hglib/config.rb
 lib/hglib/extension.rb
 lib/hglib/extension/gpg.rb
+lib/hglib/extension/topic.rb
 lib/hglib/mixins.rb
 lib/hglib/repo.rb
 lib/hglib/repo/bookmark.rb
