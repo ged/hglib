@@ -13,7 +13,7 @@ RSpec.describe Hglib::Repo::Id, :requires_binary do
 		Pathname( Dir.mktmpdir(['hglib', 'repodir']) )
 	end
 	let( :repo ) { Hglib.init(repo_dir) }
-	let( :fake_sha ) { Random.bytes(20).unpack1('h*') }
+	let( :fake_sha ) { SecureRandom.bytes(20).unpack1('h*') }
 
 
 	it "can be created for an empty repo" do

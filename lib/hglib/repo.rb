@@ -304,7 +304,7 @@ class Hglib::Repo
 
 		return string[0 .. (maxlength / 2) - 3 ] +
 			' ... ' +
-			string[ -((maxlength / 2) -3) .. ]
+			string[ -((maxlength / 2) -3) .. -1 ]
 	end
 
 end # class Hglib::Repo
