@@ -162,7 +162,7 @@ class Hglib::Server
 		output = String.new
 		errors = []
 
-		args += self.class.mangle_options( options )
+		args += self.class.mangle_options( **options )
 		self.write_command( 'runcommand', command, *args )
 
 		until done
