@@ -1,6 +1,15 @@
 # Release History for hglib
 
 ---
+
+## v0.8.0 [2020-01-21] Michael Granger <ged@FaerieMUD.org>
+
+Improvements:
+
+- Fixes for 2.7 and 2.5.
+- Including the mistakenly-omitted `topic` extension
+
+
 ## v0.7.0 [2020-01-08] Michael Granger <ged@FaerieMUD.org>
 
 Changes:
