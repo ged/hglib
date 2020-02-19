@@ -175,7 +175,7 @@ class Hglib::Server
 			when 'r'
 				done = true
 			when 'e'
-				self.log.error "Got command error: %p" % [ data ]
+				self.log.debug "Got command error: %p" % [ data ]
 				errors << data
 			when 'L'
 				self.log.debug "Server requested line input (%d bytes)" % [ data ]
