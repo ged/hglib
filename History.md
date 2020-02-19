@@ -2,6 +2,13 @@
 
 ---
 
+## v0.8.1 [2020-02-19] Michael Granger <ged@FaerieMUD.org>
+
+Improvements:
+
+- Turn down logging on error responses from the server
+
+
 ## v0.8.0 [2020-01-21] Michael Granger <ged@FaerieMUD.org>
 
 Improvements:
