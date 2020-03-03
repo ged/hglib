@@ -24,7 +24,7 @@ that uses the [Command Server][cmdserver] for efficiency.
 
     require 'hglib'
 
-    repo = Hglib.clone( 'https://https://hg.sr.ht/~ged/hglib' )
+    repo = Hglib.clone( 'https://hg.sr.ht/~ged/hglib' )
     # => #<Hglib::Repo:0x00007fae3880ec90 @path=#<Pathname:/Users/ged/temp/hglib>, @server=nil>
 
 

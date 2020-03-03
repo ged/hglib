@@ -102,6 +102,47 @@ class Hglib::Repo
 	end
 
 
+	### Schedule the given +files+ to be removed from the current branch.
+	def remove( *files, **options )
+		self.server.run( :remove, *files, **options )
+		return true
+	end
+	alias_method :rm, :remove
+
+
+	### Rename files; equivalent of copy + remove
+	###
+	### Mark +dest+ as copies of +sources+; mark +sources+ (which can be a single
+	### path or an Array of paths) for deletion. If +dest+ is a directory, copies
+	### are put in that directory. If +dest+ is a file, there can only be one
+	### +source+.
+	###
+	### By default, this command copies the contents of files as they exist in the
+	### working directory. If invoked with the :after option, the operation is recorded,
+	### but no copying is performed.
+	###
+	### This command takes effect at the next commit. To undo a rename before
+	### that, see 'hg revert'.
+	def rename( sources, dest, **options )
+		files = Array( sources ) + [ dest ]
+		self.server.run( :rename, *files, **options )
+		return true
+	end
+	alias_method :move, :rename
+	alias_method :mv, :rename
+
+
+	### Mark the specified +files+ so they will no longer be tracked after the next
+	### commit.
+	###
+	### This only removes +files+ from the current branch, not from the entire
+	### project history, and it does not delete them from the working directory.
+	def forget( *files, **options )
+		self.server.run( :forget, *files, **options )
+		return true
+	end
+
+
 	### Add all new files and remove all missing files from the repository.
 	###
 	### Unless +files+ are given, new files are ignored if they match any of the

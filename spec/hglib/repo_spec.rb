@@ -204,6 +204,46 @@ RSpec.describe Hglib::Repo do
 	end
 
 
+	it "can remove tracked files from the repository" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run ).with( :remove, "stripe.apikey" )
+
+		result = repo.rm( 'stripe.apikey' )
+		expect( result ).to be_truthy
+	end
+
+
+	it "can mark files so they will no longer be tracked after the next commit" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run ).with( :forget, "ChangeLog" )
+
+		result = repo.forget( 'ChangeLog' )
+		expect( result ).to be_truthy
+	end
+
+
+	it "can rename files in the repository" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run ).with( :rename, "README.rdoc", "README.md" )
+
+		result = repo.mv( 'README.rdoc', 'README.md' )
+		expect( result ).to be_truthy
+	end
+
+
+	it "can record all adds/moves/removes in a directory" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run ).with( :addremove, any_args )
+
+		result = repo.addremove
+		expect( result ).to be_truthy
+	end
+
+
 	it "can return the current Mercurial configuration" do
 		repo = described_class.new( repo_dir )
 
