@@ -2,6 +2,13 @@
 
 ---
 
+## v0.9.0 [2020-03-04] Michael Granger <ged@FaerieMUD.org>
+
+Improvements:
+
+- Add Repo#remove, #rename, and #forget.
+
+
 ## v0.8.1 [2020-02-19] Michael Granger <ged@FaerieMUD.org>
 
 Improvements:
