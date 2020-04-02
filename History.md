@@ -2,6 +2,13 @@
 
 ---
 
+## v0.10.1 [2020-04-02] Michael Granger <ged@FaerieMUD.org>
+
+Bugfixes:
+
+- Fix the Repo#tracked? predicate.
+
+
 ## v0.10.0 [2020-04-02] Michael Granger <ged@FaerieMUD.org>
 
 Improvements:
