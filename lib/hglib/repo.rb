@@ -300,6 +300,13 @@ class Hglib::Repo
 	end
 
 
+	### Returns +true+ if the given +filename+ is a file tracked by Mercurial.
+	def tracked?( filename )
+		status = self.status( filename )
+		return status&.tracked?
+	end
+
+
 	### Returns +true+ if all of the changesets in the specified +revset+ (or the
 	### current changeset if no +revset+ is given) are in the public phase.
 	def public?( revset=nil )

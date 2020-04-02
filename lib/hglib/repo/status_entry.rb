@@ -62,6 +62,55 @@ class Hglib::Repo::StatusEntry
 	end
 
 
+	### Returns +true+ if the status is 'modified'.
+	def modified?
+		return self.status == 'M'
+	end
+
+
+	### Returns +true+ if the status is 'added'.
+	def added?
+		return self.status == 'A'
+	end
+
+
+	### Returns +true+ if the status is 'removed'.
+	def removed?
+		return self.status == 'R'
+	end
+
+
+	### Returns +true+ if the status is 'clean'.
+	def clean?
+		return self.status == 'C'
+	end
+
+
+	### Returns +true+ if the status is 'missing'.
+	def missing?
+		return self.status == '!'
+	end
+
+
+	### Returns +true+ if the status is 'not tracked'.
+	def not_tracked?
+		return self.status == '?'
+	end
+	alias_method :untracked?, :not_tracked?
+
+
+	### Returns +true+ if the status is anything other than 'not tracked'.
+	def tracked?
+		return !self.not_tracked?
+	end
+
+
+	### Returns +true+ if the status is 'ignored'.
+	def ignored?
+		return self.status == 'I'
+	end
+
+
 	### Return a human-readable representation of the StatusEntry as a String.
 	def inspect
 		return "#<%p:#%x %s: %s%s>" % [
