@@ -302,7 +302,7 @@ class Hglib::Repo
 
 	### Returns +true+ if the given +filename+ is a file tracked by Mercurial.
 	def tracked?( filename )
-		status = self.status( filename )
+		status = self.status( filename ).first
 		return status&.tracked?
 	end
 

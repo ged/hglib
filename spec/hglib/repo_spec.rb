@@ -69,6 +69,18 @@ RSpec.describe Hglib::Repo do
 	end
 
 
+	it "can ensure a file is tracked" do
+		repo = described_class.new( repo_dir )
+
+		expect( server ).to receive( :run_with_json_template ).
+			with( :status, 'lib/version.rb' ).
+			and_return([ {path: 'lib/version.rb', status: 'M'} ]).
+			at_least( :once )
+
+		expect( repo.tracked?('lib/version.rb') ).to be_truthy
+	end
+
+
 	it "can fetch the identification of the repository's current revision" do
 		repo = described_class.new( repo_dir )
 
