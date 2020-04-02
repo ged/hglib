@@ -2,6 +2,13 @@
 
 ---
 
+## v0.10.0 [2020-04-02] Michael Granger <ged@FaerieMUD.org>
+
+Improvements:
+
+- Added file status predicates.
+
+
 ## v0.9.0 [2020-03-04] Michael Granger <ged@FaerieMUD.org>
 
 Improvements:
