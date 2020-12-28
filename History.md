@@ -1,6 +1,12 @@
 # Release History for hglib
 
 ---
+## v0.11.0 [2020-12-28] Michael Granger <ged@FaerieMUD.org>
+
+Improvements:
+
+- Update dependency for Ruby 3.
+
 
 ## v0.10.1 [2020-04-02] Michael Granger <ged@FaerieMUD.org>
 
