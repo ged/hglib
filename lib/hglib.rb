@@ -11,7 +11,7 @@ module Hglib
 
 
 	# Package version
-	VERSION = '0.11.0'
+	VERSION = '0.11.1'
 
 	# Version control revision
 	REVISION = %q$Revision$
